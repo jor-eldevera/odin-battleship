@@ -1,3 +1,20 @@
+const { default: expect } = require("expect");
 let { Ship } = require("./Ship.js");
 
-let ship = new Ship();
+let ship = new Ship(5);
+
+it("ship: new ship length", () => {
+    expect(ship.getLength()).toBe(5);
+});
+
+it("ship: take a hit", () => {
+    ship.hit();
+    expect(ship.getHits()).toBe(1);
+});
+
+it("ship: isSunk", () => {
+    for (let i = 0; i < ship.getLength() - 1; i++) {
+        ship.hit();
+    }
+    expect(ship.isSunk()).toBeTruthy();
+});
