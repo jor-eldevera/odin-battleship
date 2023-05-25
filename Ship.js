@@ -2,11 +2,13 @@ class Ship {
     #length;
     #hits;
     #isSunk;
+    #coordinates
 
-    constructor(length) {
+    constructor(coordinates, length) {
         this.#length = length;
         this.#hits = 0;
         this.#isSunk = false;
+        this.#coordinates = coordinates;
     }
 
     getLength() {
@@ -15,6 +17,10 @@ class Ship {
 
     getHits() {
         return this.#hits;
+    }
+
+    getCoordinates() {
+        return this.#coordinates;
     }
 
     hit() {
