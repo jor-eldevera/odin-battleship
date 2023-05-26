@@ -17,6 +17,12 @@ class GameBoard {
         return this.#misses;
     }
 
+    /**
+     * Place a new ship
+     * @param {Array} coordinates is an array of coordinates in [x, y] form
+     * @param {Boolean} isVertical true if ship is vertical, false for horizontal
+     * @param {Integer} length is the length of the ship
+     */
     placeShip(coordinates, isVertical, length) {
         this.#ships.push(new Ship(coordinates, isVertical, length));
     }
@@ -40,6 +46,16 @@ class GameBoard {
 
         this.#misses.push(attackCoordinates);
         return false;
+    }
+
+    checkAllShipsSunk() {
+        for (let ship of this.#ships) {
+            if (!ship.isSunk()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     compareArrays(a, b) {
