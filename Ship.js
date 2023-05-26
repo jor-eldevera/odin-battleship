@@ -5,6 +5,12 @@ class Ship {
     #coordinates;
     #isVertical;
 
+    /**
+     * Construct a new ship
+     * @param {Array} coordinates is an array of coordinates in [x, y] form
+     * @param {Boolean} isVertical true if ship is vertical, false for horizontal
+     * @param {Integer} length is the length of the ship
+     */
     constructor(coordinates, isVertical, length) {
         this.#length = length;
         this.#hits = 0;
