@@ -2,12 +2,14 @@ class Ship {
     #length;
     #hits;
     #isSunk;
-    #coordinates
+    #coordinates;
+    #isVertical;
 
-    constructor(coordinates, length) {
+    constructor(coordinates, isVertical, length) {
         this.#length = length;
         this.#hits = 0;
         this.#isSunk = false;
+        this.#isVertical = isVertical;
         this.#coordinates = coordinates;
     }
 
@@ -21,6 +23,10 @@ class Ship {
 
     getCoordinates() {
         return this.#coordinates;
+    }
+
+    getIsVertical() {
+        return this.#isVertical;
     }
 
     hit() {
