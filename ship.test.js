@@ -1,7 +1,7 @@
-const { default: expect } = require("expect");
+// const { default: expect } = require("expect");
 let { Ship } = require("./Ship.js");
 
-let ship = new Ship(5);
+let ship = new Ship([0, 0], 5);
 
 it("ship: new ship length", () => {
     expect(ship.getLength()).toBe(5);
