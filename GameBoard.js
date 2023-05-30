@@ -3,6 +3,7 @@ const { Ship } = require("./Ship.js");
 class GameBoard {
 
     #ships = [];
+    #hits = [];
     #misses = [];
 
     constructor() {
@@ -11,6 +12,10 @@ class GameBoard {
 
     getShips() {
         return this.#ships;
+    }
+
+    getHits() {
+        return this.#hits;
     }
 
     getMisses() {
@@ -31,14 +36,17 @@ class GameBoard {
         for (let ship of this.#ships) {
             let shipCoordinates = ship.getCoordinates();
             for (let i = 0; i < ship.getLength(); i++) {
-                let tempCoordinates;
+                let tempCoordinates; // used to see if the attackCoordinates are on the ship
                 if (ship.getIsVertical()) {
                     tempCoordinates = [shipCoordinates[0], shipCoordinates[1] + i];
                 } else {
                     tempCoordinates = [shipCoordinates[0] + i, shipCoordinates[1]];
                 }
+
+                // if the attack is on the ship, record a hit
                 if (this.compareArrays(attackCoordinates, tempCoordinates)) {
                     ship.hit();
+                    this.#hits.push(tempCoordinates);
                     return true;
                 }
             }
