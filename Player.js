@@ -1,6 +1,6 @@
-const { GameBoard } = require("./GameBoard.js");
+import { GameBoard } from "./GameBoard.js";
 
-class Player {
+export class Player {
     #gameboard;
 
     constructor() {
@@ -10,8 +10,4 @@ class Player {
     getGameboard() {
         return this.#gameboard;
     }
-}
-
-module.exports = {
-    Player
 }

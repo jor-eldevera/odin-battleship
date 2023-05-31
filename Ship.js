@@ -1,4 +1,4 @@
-class Ship {
+export class Ship {
     #length;
     #hits;
     #isSunk;
@@ -43,8 +43,4 @@ class Ship {
     isSunk() {
         return this.#isSunk;
     }
-}
-
-module.exports = {
-    Ship
 }

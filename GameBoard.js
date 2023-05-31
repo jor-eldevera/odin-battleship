@@ -1,6 +1,6 @@
-const { Ship } = require("./Ship.js");
+import { Ship } from "./Ship.js";
 
-class GameBoard {
+export class GameBoard {
 
     #ships = [];
     #hits = [];
@@ -48,6 +48,11 @@ class GameBoard {
         this.#ships.push(new Ship(coordinates, isVertical, length));
     }
 
+    /**
+     * Recieve an attack at specified coordinates
+     * @param {Array} attackCoordinates is an array of coordinates in [x, y] form
+     * @returns true if an attack was made, false otherwise
+     */
     recieveAttack(attackCoordinates) {
         for (let ship of this.#ships) {
             let shipCoordinates = ship.getCoordinates();
@@ -95,8 +100,4 @@ class GameBoard {
           return true;
         }
       }
-}
-
-module.exports = {
-    GameBoard
 }
