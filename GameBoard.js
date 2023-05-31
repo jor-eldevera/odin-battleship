@@ -30,6 +30,11 @@ class GameBoard {
      * @param {Integer} length is the length of the ship
      */
     placeShip(coordinates, isVertical, length) {
+        // check for zero or less coordinates
+        if (coordinates[0] <= 0 || coordinates[1] <= 0) {
+            throw new Error("placeShip: cannot place ship at [" + coordinates[0] + ", " + coordinates[1] + "]");
+        }
+
         // check if it fits on the board
         // if it's vertical, make sure it's not too low
         if (isVertical && (coordinates[1] > (this.#size - length))) {
