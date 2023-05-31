@@ -5,6 +5,7 @@ class GameBoard {
     #ships = [];
     #hits = [];
     #misses = [];
+    #size = 10;
 
     constructor() {
 
@@ -29,6 +30,16 @@ class GameBoard {
      * @param {Integer} length is the length of the ship
      */
     placeShip(coordinates, isVertical, length) {
+        // check if it fits on the board
+        // if it's vertical, make sure it's not too low
+        if (isVertical && (coordinates[1] > (this.#size - length))) {
+            throw new Error("placeShip: cannot place vertical ship at [" + coordinates[0] + ", " + coordinates[1] + "]");
+        }
+        // if it's horizontal, make sure it's not too far to the right
+        if (!isVertical && (coordinates[0] > (this.#size - length))) {
+            throw new Error("placeShip: cannot palce horizontal ship at [" + coordinates[0] + ", " + coordinates[1] + "]");
+        }
+
         this.#ships.push(new Ship(coordinates, isVertical, length));
     }
 
@@ -52,6 +63,7 @@ class GameBoard {
             }
         }
 
+        // if no hit was recorded, record a miss
         this.#misses.push(attackCoordinates);
         return false;
     }
