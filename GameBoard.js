@@ -37,11 +37,11 @@ class GameBoard {
 
         // check if it fits on the board
         // if it's vertical, make sure it's not too low
-        if (isVertical && (coordinates[1] > (this.#size - length))) {
+        if (isVertical && (coordinates[1] > (this.#size - length + 1))) {
             throw new Error("placeShip: cannot place vertical ship at [" + coordinates[0] + ", " + coordinates[1] + "]");
         }
         // if it's horizontal, make sure it's not too far to the right
-        if (!isVertical && (coordinates[0] > (this.#size - length))) {
+        if (!isVertical && (coordinates[0] > (this.#size - length + 1))) {
             throw new Error("placeShip: cannot palce horizontal ship at [" + coordinates[0] + ", " + coordinates[1] + "]");
         }
 
