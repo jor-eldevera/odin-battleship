@@ -1,5 +1,4 @@
-// const { default: expect } = require("expect");
-let { Ship } = require("./Ship.js");
+import { Ship } from "./Ship.js";
 
 let ship = new Ship([0, 0], true, 5);
 

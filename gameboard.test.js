@@ -1,4 +1,4 @@
-let { GameBoard } = require("./GameBoard.js");
+import { GameBoard } from "./GameBoard.js";
 
 let gameboard = new GameBoard();
 
