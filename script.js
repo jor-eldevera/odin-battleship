@@ -4,7 +4,9 @@ const playerOneContainer = document.getElementById("p1-container");
 const shipsContainer = document.getElementById("ships");
 
 const switchDirectionsBtn = document.getElementById("switch-directions-btn");
+
 let verticalDirection = true; // true if vertical, false if horizontal
+let activeShip;
 
 let playerOne = new Player();
 let playerTwo = new Player();
@@ -52,7 +54,23 @@ switchDirectionsBtn.addEventListener("click", (e) => {
         shipsContainer.style.flexDirection = "row";
         verticalDirection = !verticalDirection;
     }
-})
+});
+
+shipsContainer.addEventListener("click", (e) => {
+    // Check if the clicked element has the "select-ship" class
+    if (e.target.classList.contains('select-ship')) {
+        const selectedElement = e.target;
+
+        // Remove the green border from all elements
+        const selectShipElements = shipsContainer.getElementsByClassName('select-ship');
+        Array.from(selectShipElements).forEach((element) => {
+            element.style.border = '';
+        });
+
+        // Add green border to the clicked element
+        selectedElement.style.border = '1px solid green';
+    }
+});
 
 addVerticalShipsToBottom();
 function addVerticalShipsToBottom() {
@@ -108,6 +126,11 @@ function createShip(id, imageURL, width, height) {
     ship.style.width = width;
     ship.style.height = height;
     ship.classList.add("select-ship");
+
+    ship.addEventListener("click", (e) => {
+        activeShip = ship;
+        ship.style.border = "1px solid green";
+    });
     return ship;
 }
 
