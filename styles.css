@@ -17,6 +17,8 @@ body {
 
 .square {
     /* border: 1px solid red; */
+    position: relative;
+    z-index: 1;
 }
 
 .square:hover {
