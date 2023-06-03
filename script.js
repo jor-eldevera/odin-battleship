@@ -29,10 +29,10 @@ playerTwoBoard.placeShip([1, 10], false, 2);
 
 // shoot ships
 
-createGrid();
-function createGrid() {
-    for (let i = 0; i <= 10; i++) {
-        for (let j = 0; j <= 10; j++) {
+createStartingGrid();
+function createStartingGrid() {
+    for (let i = 0; i <= BOARD_SIZE; i++) {
+        for (let j = 0; j <= BOARD_SIZE; j++) {
             const square = document.createElement("div");
             if (i !== 0 && j !== 0) { // if we're not looking at the border
                 square.classList.add("square");
@@ -74,6 +74,11 @@ function createGrid() {
                             // finally add the new ship
                             const newShip = createShipForBoardOverlay(newShipID, shipDirection, imageURL, width, height);
                             square.appendChild(newShip);
+
+                            // if five ships are placed, move on to the next stage
+                            if (fiveShipsPlaced()) {
+                                console.log("test");
+                            }
                         }
                     }
                 });
@@ -237,6 +242,24 @@ function lookUpShipSize(id) {
     }
 
     return shipSize;
+}
+
+/**
+ * Checks if five ships have been placed on the board
+ */
+function fiveShipsPlaced() {
+    let squares = document.getElementsByClassName("square");
+    let shipCount = 0;
+    for (let square of squares) {
+        if (square.hasChildNodes()) {
+            shipCount++;
+        }
+    }
+
+    if (shipCount === 5) {
+        return true;
+    }
+    return false;
 }
 
 function removeAllChildNodes(parent) {
