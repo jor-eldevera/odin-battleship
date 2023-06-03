@@ -1,5 +1,7 @@
 import { Player } from "./Player.js";
 
+const BOARD_SIZE = 10;
+
 const playerOneContainer = document.getElementById("p1-container");
 const shipsContainer = document.getElementById("ships");
 
@@ -35,33 +37,46 @@ function createGrid() {
             if (i !== 0 && j !== 0) { // if we're not looking at the border
                 square.classList.add("square");
                 square.addEventListener("click", (e) => {
-                    // if it doesn't have children add the overlay
+                    // if the square doesn't have children and a ship is active, add the overlay
                     if (!square.firstChild && activeShip) {
-                        // first detect the ship we're trying to add (if one is selected)
+                        // first detect the ship we're trying to add
                         let shipType = activeShip.id.split("-")[0];
                         let shipDirection = activeShip.id.split("-")[1];
                         let newShipID = activeShip.id + "-overlay";
                         let imageURL = activeShip.style.backgroundImage.slice(5, -2);
                         let width = activeShip.style.width;
                         let height = activeShip.style.height;
-
-                        // then remove the previous ship if it's already there
-                        let oldShipHorizontal = document.querySelector("#" + shipType + "-horizontal-overlay");
-                        if (oldShipHorizontal) {
-                            const parentSquare = oldShipHorizontal.parentNode;
-                            parentSquare.removeChild(oldShipHorizontal);
+                        
+                        // then detect if the ship is small enough to be placed at this square
+                        let isVertical = false;
+                        if (shipDirection === "vertical") {
+                            isVertical = true;
+                        } else if (shipDirection === "horizontal") {
+                            isVertical = false;
+                        } else {
+                            isVertical = null;
                         }
-                        let oldShipVertical = document.querySelector("#" + shipType + "-vertical-overlay");
-                        if (oldShipVertical) {
-                            const parentSquare = oldShipVertical.parentNode;
-                            parentSquare.removeChild(oldShipVertical);
+                        let verticalShipIsSmallEnough = !(isVertical && (i > (BOARD_SIZE - lookUpShipSize(activeShip.id) + 1)));
+                        let horizontalShipIsSmallEnough = !(!isVertical && (j > (BOARD_SIZE - lookUpShipSize(activeShip.id) + 1)));
+                        if (verticalShipIsSmallEnough && horizontalShipIsSmallEnough) {
+                            // then remove the previous ship if it's already there
+                            let oldShipHorizontal = document.querySelector("#" + shipType + "-horizontal-overlay");
+                            if (oldShipHorizontal) {
+                                const parentSquare = oldShipHorizontal.parentNode;
+                                parentSquare.removeChild(oldShipHorizontal);
+                            }
+                            let oldShipVertical = document.querySelector("#" + shipType + "-vertical-overlay");
+                            if (oldShipVertical) {
+                                const parentSquare = oldShipVertical.parentNode;
+                                parentSquare.removeChild(oldShipVertical);
+                            }
+    
+                            // finally add the new ship
+                            const newShip = createShipForBoardOverlay(newShipID, shipDirection, imageURL, width, height);
+                            square.appendChild(newShip);
                         }
-
-                        // finally add the new ship
-                        const newShip = createShipForBoardOverlay(newShipID, shipDirection, imageURL, width, height);
-                        square.appendChild(newShip);
                     }
-                })
+                });
             }
             
             playerOneContainer.appendChild(square);
@@ -188,6 +203,40 @@ function createShipForBoardOverlay(id, direction, imageURL, width, height) {
     const ship = createShip(id, direction, imageURL, width, height);
 
     return ship;
+}
+
+/**
+ * Find the size of a ship in squares
+ * @param {String} id id of the ship (ship filename with a dash instead of an underscore, also excluding ".png")
+ * @returns the size of the ship in squares
+ */
+function lookUpShipSize(id) {
+    let shipSize = 0;
+
+    switch(id) {
+        case "patrol-horizontal":
+        case "patrol-vertical":
+            shipSize = 2;
+            break;
+        case "destroyer-horizontal":
+        case "destroyer-vertical":
+        case "submarine-horizontal":
+        case "submarine-vertical":
+            shipSize = 3;
+            break;
+        case "battleship-horizontal":
+        case "battleship-vertical":
+            shipSize = 4;
+            break;
+        case "carrier-horizontal":
+        case "carrier-vertical":
+            shipSize = 5;
+            break;
+        default:
+            shipSize = 0;
+    }
+
+    return shipSize;
 }
 
 function removeAllChildNodes(parent) {
