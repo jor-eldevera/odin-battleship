@@ -64,9 +64,9 @@ function createStartingGrid() {
 
                         // then detect if the ship overlaps other ships
                         let overlapsOtherShips = checkOverlap(i, j, shipType, shipDirection);
-                        console.log(shipType + " overlap?: " + overlapsOtherShips);
+                        // console.log(shipType + " overlap?: " + overlapsOtherShips);
 
-                        if (verticalShipIsSmallEnough && horizontalShipIsSmallEnough) {
+                        if (!overlapsOtherShips && verticalShipIsSmallEnough && horizontalShipIsSmallEnough) {
                             // then remove the previous ship if it's already there
                             let oldShipHorizontal = document.querySelector("#" + shipType + "-horizontal-overlay");
                             if (oldShipHorizontal) {
@@ -99,6 +99,7 @@ function createStartingGrid() {
 }
 
 switchDirectionsBtn.addEventListener("click", (e) => {
+    activeShip = null;
     if (verticalDirection) {
         addHorizontalShipsToBottom();
         shipsContainer.style.flexDirection = "column";
