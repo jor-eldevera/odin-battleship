@@ -4,8 +4,11 @@ const BOARD_SIZE = 10;
 
 const playerOneContainer = document.getElementById("p1-container");
 const shipsContainer = document.getElementById("ships");
+const choosingPhaseContainer = document.getElementById("choosing-phase");
 
 const switchDirectionsBtn = document.getElementById("switch-directions-btn");
+const confirmPlacementBtn = document.getElementById("confirm-placement-btn");
+confirmPlacementBtn.disabled = true;
 
 let verticalDirection = true; // true if vertical, false if horizontal
 let activeShip;
@@ -77,7 +80,7 @@ function createStartingGrid() {
 
                             // if five ships are placed, move on to the next stage
                             if (fiveShipsPlaced()) {
-                                console.log("test");
+                                unlockConfirmPlacementButton();
                             }
                         }
                     }
@@ -261,6 +264,14 @@ function fiveShipsPlaced() {
     }
     return false;
 }
+
+function unlockConfirmPlacementButton() {
+    confirmPlacementBtn.disabled = false;
+}
+
+confirmPlacementBtn.addEventListener("click", (e) => {
+    choosingPhaseContainer.style.display = "none";
+})
 
 function removeAllChildNodes(parent) {
     while (parent.firstChild) {
