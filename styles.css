@@ -18,7 +18,7 @@ body {
 .square {
     /* border: 1px solid red; */
     position: relative;
-    z-index: 1;
+    z-index: 2;
 }
 
 .square:hover {
@@ -34,4 +34,9 @@ body {
 .select-ship:hover {
     background-color: rgba(255, 255, 255, 0.486);
     border: 1px solid green;
+}
+
+#choosing-phase {
+    display: flex;
+    flex-direction: column;
 }
