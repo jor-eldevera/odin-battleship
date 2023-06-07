@@ -50,7 +50,7 @@ function createStartingGrid() {
                         let width = activeShip.style.width;
                         let height = activeShip.style.height;
                         
-                        // then detect if the ship is small enough to be placed at this square
+                        // then detect if the ship overflows the borders of the map
                         let isVertical = false;
                         if (shipDirection === "vertical") {
                             isVertical = true;
@@ -61,6 +61,11 @@ function createStartingGrid() {
                         }
                         let verticalShipIsSmallEnough = !(isVertical && (i > (BOARD_SIZE - lookUpShipSize(activeShip.id) + 1)));
                         let horizontalShipIsSmallEnough = !(!isVertical && (j > (BOARD_SIZE - lookUpShipSize(activeShip.id) + 1)));
+
+                        // then detect if the ship overlaps other ships
+                        let overlapsOtherShips = checkOverlap(i, j, shipType, shipDirection);
+                        console.log(shipType + " overlap?: " + overlapsOtherShips);
+
                         if (verticalShipIsSmallEnough && horizontalShipIsSmallEnough) {
                             // then remove the previous ship if it's already there
                             let oldShipHorizontal = document.querySelector("#" + shipType + "-horizontal-overlay");
@@ -87,6 +92,7 @@ function createStartingGrid() {
                 });
             }
             
+            square.id = j + "-" + i;
             playerOneContainer.appendChild(square);
         }
     }
@@ -248,6 +254,83 @@ function lookUpShipSize(id) {
 }
 
 /**
+ * Checks if the ship with the given information is overlapping with another ship on the board
+ * @param {Number} i the y coordinate
+ * @param {Number} j the x coordinate
+ * @param {String} shipType the type of the ship
+ * @param {String} shipDirection the direction of the ship
+ * @returns true if this ship is overlapping with another ship
+ */
+function checkOverlap(i, j, shipType, shipDirection) {
+    let shipLength = lookUpShipSize(shipType + "-" + shipDirection);
+    let squares = document.getElementsByClassName("square");
+    for (let square of squares) {
+        if (square.hasChildNodes()) {
+            let x = Number(square.id.split("-")[0]);
+            let y = Number(square.id.split("-")[1]);
+            let overlappingShipElement = square.children[0];
+            let overlappingShipType = overlappingShipElement.id.split("-")[0];
+            let overlappingShipDirection = overlappingShipElement.id.split("-")[1];
+            let overlappingShipSize = lookUpShipSize(overlappingShipType + "-" + overlappingShipDirection);
+
+            // A ship can never overlap itself
+            if (shipType === overlappingShipType) {
+                continue;
+            }
+
+            // Check if ships have different orientations
+            if (shipDirection !== overlappingShipDirection) {
+                // Check if ship1 is horizontal and ship2 is vertical
+                if (shipDirection === 'horizontal' && overlappingShipDirection === 'vertical') {
+                    if (
+                        x >= j && x <= j + shipLength - 1 && // x is between j and the end
+                        i >= y && i <= y + overlappingShipSize - 1 // y is between i and the end
+                    ) {
+                        // console.log("x=" + x + " y=" + y + " j=" + j + " i=" + i + " shipLength=" + shipLength + " overlappingShipSize=" + overlappingShipSize);
+                        console.log("overlap 1");
+                        return true; // Overlapping ships
+                    }
+                }
+                // Check if ship1 is vertical and ship2 is horizontal
+                else if (shipDirection === 'vertical' && overlappingShipDirection === 'horizontal') {
+                    if (
+                        j >= x && j <= x + overlappingShipSize - 1 &&
+                        y >= i && y <= i + shipLength - 1
+                    ) {
+                        console.log("overlap 2");
+                        return true; // Overlapping ships
+                    }
+                }
+            // Check if ships have the same orientation
+            } else if (shipDirection === overlappingShipDirection) {
+                // Check if ships are horizontal
+                if (shipDirection === 'horizontal') {
+                    // Check if the horizontal segments overlap
+                    if (i == y && 
+                        (j + shipLength > x) && 
+                        (j < x + overlappingShipSize)) {
+                        console.log("overlap 3");
+                        return true; // Overlapping ships
+                    }
+                } 
+                // Check if ships are vertical
+                else if (shipDirection === 'vertical') {
+                    // Check if the vertical segments overlap
+                    if (j == x && 
+                        i + shipLength > y && 
+                        i < y + overlappingShipSize) {
+                        console.log("overlap 4");
+                        return true; // Overlapping ships
+                    }
+                }
+            }
+            // console.log("not overlapping");
+        }
+    }
+    return false;
+}
+
+/**
  * Checks if five ships have been placed on the board
  */
 function fiveShipsPlaced() {
@@ -264,6 +347,7 @@ function fiveShipsPlaced() {
     }
     return false;
 }
+
 
 function unlockConfirmPlacementButton() {
     confirmPlacementBtn.disabled = false;
