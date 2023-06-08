@@ -11,20 +11,39 @@
 </head>
 <body>
     <h1>Battleship!</h1>
-    <div id="p1-container">
-
+    <div id="vs-phase">
+        <button id="play-vs-computer-btn" class="vs-btn">
+            Play vs. computer
+        </button>
+        <button id="play-vs-player-btn" class="vs-btn">
+            Play vs. player (pass and play)
+        </button>
     </div>
-    <div id="p2-container">
 
-    </div>
-
-    <div id="choosing-phase">
-        <button id="confirm-placement-btn" disabled>Confirm Ship Placements</button>
-        <button id="switch-directions-btn">Switch Direction</button>
-        <div id="ships">
-        
+    <div id="game-phase">
+        <div id="p1-container">
+    
+        </div>
+        <div id="p2-container">
+    
+        </div>
+    
+        <div id="choosing-phase">
+            <button id="confirm-placement-btn" disabled>Confirm Ship Placements</button>
+            <button id="switch-directions-btn">Switch Direction</button>
+            <div id="ships">
+            
+            </div>
+        </div>
+    
+        <div id="battle-phase">
+            <button id="new-game-btn" disabled>Start a new game</button>
+            <div id="winner-text">
+    
+            </div>
         </div>
     </div>
+
     <footer>by Jorell de Vera</footer>
 </body>
 </html>
