@@ -5,6 +5,22 @@ body {
     align-items: center;
 }
 
+#vs-phase {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.vs-btn {
+    display: block;
+}
+
+#game-phase {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 #p1-container {
     display: grid;
     grid-gap: .5px;
@@ -24,6 +40,23 @@ body {
 .square:hover {
     background-color: rgba(255, 255, 255, 0.11);
     background-image: url(Tokens/select_token.png);
+}
+
+.attack-square:hover {
+    background-color: rgba(255, 255, 255, 0.11);
+    background-image: url(Tokens/aim_token.png);
+}
+
+.hit {
+    background-image: url(Tokens/hit_token.png);
+}
+
+.miss {
+    background-image: url(Tokens/miss_token.png);
+}
+
+#battle-phase {
+    display: none;
 }
 
 #ships {
