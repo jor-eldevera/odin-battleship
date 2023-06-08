@@ -5,10 +5,15 @@ const BOARD_SIZE = 10;
 const playerOneContainer = document.getElementById("p1-container");
 const shipsContainer = document.getElementById("ships");
 const choosingPhaseContainer = document.getElementById("choosing-phase");
+const battlePhaseContainer = document.getElementById("battle-phase");
 
 const switchDirectionsBtn = document.getElementById("switch-directions-btn");
 const confirmPlacementBtn = document.getElementById("confirm-placement-btn");
 confirmPlacementBtn.disabled = true;
+const newGameBtn = document.getElementById("new-game-btn");
+newGameBtn.disabled = true;
+
+const winnerText = document.getElementById("winner-text");
 
 let verticalDirection = true; // true if vertical, false if horizontal
 let activeShip;
@@ -18,17 +23,17 @@ let playerTwo = new Player();
 let playerOneBoard = playerOne.getGameboard();
 let playerTwoBoard = playerTwo.getGameboard();
 // place ships
-playerOneBoard.placeShip([1, 1], true, 5);
-playerOneBoard.placeShip([2, 1], true, 4);
-playerOneBoard.placeShip([3, 1], true, 3);
-playerOneBoard.placeShip([4, 1], true, 3);
-playerOneBoard.placeShip([5, 1], true, 2);
+// playerOneBoard.placeShip([1, 1], true, 5);
+// playerOneBoard.placeShip([2, 1], true, 4);
+// playerOneBoard.placeShip([3, 1], true, 3);
+// playerOneBoard.placeShip([4, 1], true, 3);
+// playerOneBoard.placeShip([5, 1], true, 2);
 
-playerTwoBoard.placeShip([1, 6], false, 5);
-playerTwoBoard.placeShip([1, 7], false, 4);
-playerTwoBoard.placeShip([1, 8], false, 3);
-playerTwoBoard.placeShip([1, 9], false, 3);
-playerTwoBoard.placeShip([1, 10], false, 2);
+// playerTwoBoard.placeShip([1, 6], false, 5);
+// playerTwoBoard.placeShip([1, 7], false, 4);
+// playerTwoBoard.placeShip([1, 8], false, 3);
+// playerTwoBoard.placeShip([1, 9], false, 3);
+// playerTwoBoard.placeShip([1, 10], false, 2);
 
 // shoot ships
 
@@ -307,7 +312,7 @@ function checkOverlap(i, j, shipType, shipDirection) {
                 // Check if ships are horizontal
                 if (shipDirection === 'horizontal') {
                     // Check if the horizontal segments overlap
-                    if (i == y && 
+                    if (i === y && 
                         (j + shipLength > x) && 
                         (j < x + overlappingShipSize)) {
                         console.log("overlap 3");
@@ -317,7 +322,7 @@ function checkOverlap(i, j, shipType, shipDirection) {
                 // Check if ships are vertical
                 else if (shipDirection === 'vertical') {
                     // Check if the vertical segments overlap
-                    if (j == x && 
+                    if (j === x && 
                         i + shipLength > y && 
                         i < y + overlappingShipSize) {
                         console.log("overlap 4");
@@ -354,9 +359,88 @@ function unlockConfirmPlacementButton() {
     confirmPlacementBtn.disabled = false;
 }
 
+const controller = new AbortController();
+const { signal } = controller;
 confirmPlacementBtn.addEventListener("click", (e) => {
     choosingPhaseContainer.style.display = "none";
-})
+
+    // Add all pieces to a GameBoard
+    addShipsToGameBoard();
+
+    // Set up computer's GameBoard
+    playerTwoBoard.placeShip([1, 6], false, 5);
+    playerTwoBoard.placeShip([1, 7], false, 4);
+    playerTwoBoard.placeShip([1, 8], false, 3);
+    playerTwoBoard.placeShip([1, 9], false, 3);
+    playerTwoBoard.placeShip([1, 10], false, 2);
+
+    // Start attacking
+    // Clear the board
+    // Remove all ships from the board
+    // Remove all squares and replace with new squares
+    while (playerOneContainer.firstChild) {
+        playerOneContainer.removeChild(playerOneContainer.firstChild);
+    }
+    for (let i = 0; i <= BOARD_SIZE; i++) {
+        for (let j = 0; j <= BOARD_SIZE; j++) {
+            const square = document.createElement("div");
+            if (i !== 0 && j !== 0) { // if we're not looking at the border
+                square.classList.add("attack-square");
+                // Add new event listeners that call GameBoard's recieveAttack
+                square.addEventListener("click", function shootBoard() {
+                    let isHit = playerTwoBoard.recieveAttack([j, i]);
+
+                    if (isHit) {
+                        // Add hit class so that the background is a hit marker
+                        square.classList.add("hit");
+                    } else {
+                        // Add miss class so that the background is a miss token
+                        square.classList.add("miss");
+                    }
+
+                    let allShipsSunk = playerTwoBoard.checkAllShipsSunk();
+                    if (allShipsSunk) {
+                        // Abort all event listeners
+                        controller.abort();
+
+                        battlePhaseContainer.style.display = "block";
+                        // Display winner message
+                        winnerText.innerText = "You have won!";
+                        // Option to restart game
+                        newGameBtn.disabled = false;
+                    }
+                }, { signal });
+            }
+
+            playerOneContainer.appendChild(square);
+        }
+    }
+
+    // Send hits in a loop
+});
+
+function addShipsToGameBoard() {
+    let squares = document.getElementsByClassName("square");
+    for (let square of squares) {
+        if (square.hasChildNodes()) {
+            let x = Number(square.id.split("-")[0]);
+            let y = Number(square.id.split("-")[1]);
+            let shipElement = square.children[0];
+            let shipType = shipElement.id.split("-")[0];
+            let shipDirection = shipElement.id.split("-")[1];
+            let shipSize = lookUpShipSize(shipType + "-" + shipDirection);
+
+            let isVertical = false;
+            if (shipDirection === "vertical") {
+                isVertical = true;
+            } else if (shipDirection === "horizontal") {
+                isVertical = false;
+            }
+
+            playerOneBoard.placeShip([x, y], isVertical, shipSize);
+        }
+    }
+}
 
 function removeAllChildNodes(parent) {
     while (parent.firstChild) {
