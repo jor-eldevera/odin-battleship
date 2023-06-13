@@ -31,8 +31,24 @@ export class Ship {
         return this.#coordinates;
     }
 
+    getX() {
+        return this.#coordinates[0];
+    }
+
+    getY() {
+        return this.#coordinates[1];
+    }
+
     getIsVertical() {
         return this.#isVertical;
+    }
+
+    getDirection() {
+        if (this.#isVertical) {
+            return "vertical";
+        } else {
+            return "horizontal";
+        }
     }
 
     hit() {
