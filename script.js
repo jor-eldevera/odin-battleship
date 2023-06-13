@@ -3,10 +3,14 @@ import { Player } from "./Player.js";
 const BOARD_SIZE = 10;
 
 const playerOneContainer = document.getElementById("p1-container");
-const shipsContainer = document.getElementById("ships");
+const vsPhaseContainer = document.getElementById("vs-phase")
+const gamePhaseContainer = document.getElementById("game-phase");
 const choosingPhaseContainer = document.getElementById("choosing-phase");
 const battlePhaseContainer = document.getElementById("battle-phase");
+const shipsContainer = document.getElementById("ships");
 
+const vsComputerBtn = document.getElementById("play-vs-computer-btn");
+const vsPlayerBtn = document.getElementById("play-vs-player-btn");
 const switchDirectionsBtn = document.getElementById("switch-directions-btn");
 const confirmPlacementBtn = document.getElementById("confirm-placement-btn");
 confirmPlacementBtn.disabled = true;
@@ -15,30 +19,33 @@ newGameBtn.disabled = true;
 
 const winnerText = document.getElementById("winner-text");
 
-let verticalDirection = true; // true if vertical, false if horizontal
+let verticalDirection = true; // true if vertical, false if horizontal. used when placing ships
 let activeShip;
+let gameType; // "computer" if vs comptuer, "player" if vs player
 
 let playerOne = new Player();
 let playerTwo = new Player();
 let playerOneBoard = playerOne.getGameboard();
 let playerTwoBoard = playerTwo.getGameboard();
-// place ships
-// playerOneBoard.placeShip([1, 1], true, 5);
-// playerOneBoard.placeShip([2, 1], true, 4);
-// playerOneBoard.placeShip([3, 1], true, 3);
-// playerOneBoard.placeShip([4, 1], true, 3);
-// playerOneBoard.placeShip([5, 1], true, 2);
 
-// playerTwoBoard.placeShip([1, 6], false, 5);
-// playerTwoBoard.placeShip([1, 7], false, 4);
-// playerTwoBoard.placeShip([1, 8], false, 3);
-// playerTwoBoard.placeShip([1, 9], false, 3);
-// playerTwoBoard.placeShip([1, 10], false, 2);
+vsComputerBtn.addEventListener("click", (e) => {
+    gameType = "computer";
+    confirmPlacementAction = vsComputerAction;
 
-// shoot ships
+    // Unveil the game-phase stuff
+    gamePhaseContainer.style.display = "flex";
+    gamePhaseContainer.style.flexDirection = "column";
+    gamePhaseContainer.style.alignItems = "center";
 
-createStartingGrid();
-function createStartingGrid() {
+    // Hide the vs-phase stuff
+    vsPhaseContainer.style.display = "none";
+
+    // Let them choose their ships
+    createStartingGrid(playerOneContainer);
+});
+
+function createStartingGrid(playerContainer) {
+    removeAllChildNodes(playerContainer);
     for (let i = 0; i <= BOARD_SIZE; i++) {
         for (let j = 0; j <= BOARD_SIZE; j++) {
             const square = document.createElement("div");
@@ -68,7 +75,7 @@ function createStartingGrid() {
                         let horizontalShipIsSmallEnough = !(!isVertical && (j > (BOARD_SIZE - lookUpShipSize(activeShip.id) + 1)));
 
                         // then detect if the ship overlaps other ships
-                        let overlapsOtherShips = checkOverlap(i, j, shipType, shipDirection);
+                        let overlapsOtherShips = checkOverlapAllShips(i, j, shipType, shipDirection);
                         // console.log(shipType + " overlap?: " + overlapsOtherShips);
 
                         if (!overlapsOtherShips && verticalShipIsSmallEnough && horizontalShipIsSmallEnough) {
@@ -98,7 +105,7 @@ function createStartingGrid() {
             }
             
             square.id = j + "-" + i;
-            playerOneContainer.appendChild(square);
+            playerContainer.appendChild(square);
         }
     }
 }
@@ -236,20 +243,25 @@ function lookUpShipSize(id) {
     switch(id) {
         case "patrol-horizontal":
         case "patrol-vertical":
+        case "patrol":
             shipSize = 2;
             break;
         case "destroyer-horizontal":
         case "destroyer-vertical":
+        case "destroyer":
         case "submarine-horizontal":
         case "submarine-vertical":
+        case "submarine":
             shipSize = 3;
             break;
         case "battleship-horizontal":
         case "battleship-vertical":
+        case "battleship":
             shipSize = 4;
             break;
         case "carrier-horizontal":
         case "carrier-vertical":
+        case "carrier":
             shipSize = 5;
             break;
         default:
@@ -267,7 +279,7 @@ function lookUpShipSize(id) {
  * @param {String} shipDirection the direction of the ship
  * @returns true if this ship is overlapping with another ship
  */
-function checkOverlap(i, j, shipType, shipDirection) {
+function checkOverlapAllShips(i, j, shipType, shipDirection) {
     let shipLength = lookUpShipSize(shipType + "-" + shipDirection);
     let squares = document.getElementsByClassName("square");
     for (let square of squares) {
@@ -284,55 +296,82 @@ function checkOverlap(i, j, shipType, shipDirection) {
                 continue;
             }
 
-            // Check if ships have different orientations
-            if (shipDirection !== overlappingShipDirection) {
-                // Check if ship1 is horizontal and ship2 is vertical
-                if (shipDirection === 'horizontal' && overlappingShipDirection === 'vertical') {
-                    if (
-                        x >= j && x <= j + shipLength - 1 && // x is between j and the end
-                        i >= y && i <= y + overlappingShipSize - 1 // y is between i and the end
-                    ) {
-                        // console.log("x=" + x + " y=" + y + " j=" + j + " i=" + i + " shipLength=" + shipLength + " overlappingShipSize=" + overlappingShipSize);
-                        console.log("overlap 1");
-                        return true; // Overlapping ships
-                    }
-                }
-                // Check if ship1 is vertical and ship2 is horizontal
-                else if (shipDirection === 'vertical' && overlappingShipDirection === 'horizontal') {
-                    if (
-                        j >= x && j <= x + overlappingShipSize - 1 &&
-                        y >= i && y <= i + shipLength - 1
-                    ) {
-                        console.log("overlap 2");
-                        return true; // Overlapping ships
-                    }
-                }
-            // Check if ships have the same orientation
-            } else if (shipDirection === overlappingShipDirection) {
-                // Check if ships are horizontal
-                if (shipDirection === 'horizontal') {
-                    // Check if the horizontal segments overlap
-                    if (i === y && 
-                        (j + shipLength > x) && 
-                        (j < x + overlappingShipSize)) {
-                        console.log("overlap 3");
-                        return true; // Overlapping ships
-                    }
-                } 
-                // Check if ships are vertical
-                else if (shipDirection === 'vertical') {
-                    // Check if the vertical segments overlap
-                    if (j === x && 
-                        i + shipLength > y && 
-                        i < y + overlappingShipSize) {
-                        console.log("overlap 4");
-                        return true; // Overlapping ships
-                    }
-                }
+            // if (checkOverlap(x, y, shipDirection, shipLength, j, i, overlappingShipDirection, overlappingShipSize)) {
+            if (checkOverlap(j, i, shipDirection, shipLength, x, y, overlappingShipDirection, overlappingShipSize)) {
+                return true;
             }
-            // console.log("not overlapping");
         }
     }
+    return false;
+}
+
+// checkOverlap(5, 7, "horizontal", 3, 7, 3, "vertical", 5);
+// checkOverlap(7, 3, "vertical", 5, 5, 7, "horizontal", 3);
+
+/**
+ * Checks if two ships are overlapping
+ * @param {Number} x The x coordinate of ship 1
+ * @param {Number} y The y cooridnate of ship 1
+ * @param {String} shipDirection Either vertical or horizontal
+ * @param {Number} shipLength The length of ship 1
+ * @param {Number} j The x coordinate of ship 2
+ * @param {Number} i The y coordinate of ship 2
+ * @param {String} overlappingShipDirection Vertical or horizontal direction of ship 2
+ * @param {Number} overlappingShipSize The length of ship 2
+ * @returns true if overlapping, false otherwise
+ */
+function checkOverlap(x, y, shipDirection, shipLength, j, i, overlappingShipDirection, overlappingShipSize) {
+    // console.log("x=" + x + " y=" + y + " shipDirection=" + shipDirection + " shipLength=" + shipLength + ", j=" + j + " i=" + i + " overlappingShipDirection=" + overlappingShipDirection + " overlappingShipSize=" + overlappingShipSize);
+    // Check if ships have different orientations
+    if (shipDirection !== overlappingShipDirection) {
+        // Check if ship1 is horizontal and ship2 is vertical
+        if (shipDirection === 'horizontal' && overlappingShipDirection === 'vertical') {
+            if (
+                x <= j && x >= j - shipLength + 1 && // x is between j and the end
+                i <= y && i >= y - overlappingShipSize + 1 // y is between i and the end
+                ) {
+                // console.log("x=" + x + " y=" + y + " j=" + j + " i=" + i + " shipLength=" + shipLength + " overlappingShipSize=" + overlappingShipSize);
+                console.log("overlap 1");
+                return true; // Overlapping ships
+            }
+        }
+        // Check if ship1 is vertical and ship2 is horizontal
+        else if (shipDirection === 'vertical' && overlappingShipDirection === 'horizontal') {
+            if (
+                j <= x && j >= x - overlappingShipSize + 1 &&
+                y <= i && y >= i - shipLength + 1
+            ) {
+                // console.log("x=" + x + " y=" + y + " j=" + j + " i=" + i + " shipLength=" + shipLength + " overlappingShipSize=" + overlappingShipSize);
+                console.log("overlap 2");
+                return true; // Overlapping ships
+            }
+        }
+    // Check if ships have the same orientation
+    } else if (shipDirection === overlappingShipDirection) {
+        // Check if ships are horizontal
+        if (shipDirection === 'horizontal') {
+            // Check if the horizontal segments overlap
+            if (i === y && 
+                (j + shipLength > x) && 
+                (j < x + overlappingShipSize)) {
+                // console.log("x=" + x + " y=" + y + " j=" + j + " i=" + i + " shipLength=" + shipLength + " overlappingShipSize=" + overlappingShipSize);
+                console.log("overlap 3");
+                return true; // Overlapping ships
+            }
+        } 
+        // Check if ships are vertical
+        else if (shipDirection === 'vertical') {
+            // Check if the vertical segments overlap
+            if (j === x && 
+                i + shipLength > y && 
+                i < y + overlappingShipSize) {
+                // console.log("x=" + x + " y=" + y + " j=" + j + " i=" + i + " shipLength=" + shipLength + " overlappingShipSize=" + overlappingShipSize);
+                console.log("overlap 4");
+                return true; // Overlapping ships
+            }
+        }
+    }
+
     return false;
 }
 
@@ -361,26 +400,147 @@ function unlockConfirmPlacementButton() {
 
 const controller = new AbortController();
 const { signal } = controller;
-confirmPlacementBtn.addEventListener("click", (e) => {
+confirmPlacementBtn.addEventListener("click", listenerFunction);
+
+let confirmPlacementAction;
+
+function listenerFunction() {
+    confirmPlacementAction();
+}
+
+if (gameType === "computer") {
+    confirmPlacementAction = vsComputerAction;
+} else if (gameType === "player") {
+    confirmPlacementAction = vsPlayerAction;
+}
+
+function vsComputerAction() {
     choosingPhaseContainer.style.display = "none";
 
     // Add all pieces to a GameBoard
-    addShipsToGameBoard();
+    addShipsToGameBoard(playerOneBoard);
 
     // Set up computer's GameBoard
-    playerTwoBoard.placeShip([1, 6], false, 5);
-    playerTwoBoard.placeShip([1, 7], false, 4);
-    playerTwoBoard.placeShip([1, 8], false, 3);
-    playerTwoBoard.placeShip([1, 9], false, 3);
-    playerTwoBoard.placeShip([1, 10], false, 2);
+    placeShipsRandomly(playerTwoBoard);
 
     // Start attacking
-    // Clear the board
-    // Remove all ships from the board
     // Remove all squares and replace with new squares
-    while (playerOneContainer.firstChild) {
-        playerOneContainer.removeChild(playerOneContainer.firstChild);
+    buildAttackBoard();
+}
+
+function addShipsToGameBoard(gameBoard) {
+    let squares = document.getElementsByClassName("square");
+    for (let square of squares) {
+        if (square.hasChildNodes()) {
+            let x = Number(square.id.split("-")[0]);
+            let y = Number(square.id.split("-")[1]);
+            let shipElement = square.children[0];
+            let shipType = shipElement.id.split("-")[0];
+            let shipDirection = shipElement.id.split("-")[1];
+            let shipSize = lookUpShipSize(shipType + "-" + shipDirection);
+
+            let isVertical = false;
+            if (shipDirection === "vertical") {
+                isVertical = true;
+            } else if (shipDirection === "horizontal") {
+                isVertical = false;
+            }
+
+            gameBoard.placeShip([x, y], isVertical, shipSize);
+        }
     }
+}
+
+/**
+ * Randomly places the 5 ships on a GameBoard
+ * @param {GameBoard} gameBoard is the GameBoard ships are placed on
+ */
+function placeShipsRandomly(gameBoard) {
+    let shipType = "patrol";
+    let randomCoordinatesAndDirection = generateRandomCoordinates(shipType, gameBoard);
+    gameBoard.placeShip(randomCoordinatesAndDirection[0], randomCoordinatesAndDirection[1], lookUpShipSize(shipType));
+
+    shipType = "destroyer";
+    randomCoordinatesAndDirection = generateRandomCoordinates(shipType, gameBoard);
+    gameBoard.placeShip(randomCoordinatesAndDirection[0], randomCoordinatesAndDirection[1], lookUpShipSize(shipType));
+
+    shipType = "submarine";
+    randomCoordinatesAndDirection = generateRandomCoordinates(shipType, gameBoard);
+    gameBoard.placeShip(randomCoordinatesAndDirection[0], randomCoordinatesAndDirection[1], lookUpShipSize(shipType));
+
+    shipType = "battleship";
+    randomCoordinatesAndDirection = generateRandomCoordinates(shipType, gameBoard);
+    gameBoard.placeShip(randomCoordinatesAndDirection[0], randomCoordinatesAndDirection[1], lookUpShipSize(shipType));
+
+    shipType = "carrier";
+    randomCoordinatesAndDirection = generateRandomCoordinates(shipType, gameBoard);
+    gameBoard.placeShip(randomCoordinatesAndDirection[0], randomCoordinatesAndDirection[1], lookUpShipSize(shipType));
+}
+
+function generateRandomCoordinates(shipType, gameBoard) {
+    let shipDirection;
+    let isCoordinatesValid = false;
+    let x;
+    let y;
+    while (!isCoordinatesValid) {
+        if (Math.floor(Math.random() * 2) === 1) {
+            shipDirection = "vertical";
+        } else {
+            shipDirection = "horizontal"
+        }
+        x = Math.floor(Math.random() * 10) + 1;
+        y = Math.floor(Math.random() * 10) + 1;
+        isCoordinatesValid = checkCoordinatesValid(x, y, shipType, shipDirection, gameBoard);
+    }
+
+    if (shipDirection === "vertical") {
+        shipDirection = true;
+    } else if (shipDirection === "horizontal") {
+        shipDirection = false;
+    }
+    return [[x, y], shipDirection];
+}
+
+/**
+ * Checks if given coordinates & ship type are valid on the passed GameBoard
+ * @param {Number} x The x coordinate
+ * @param {Number} y The y coordinate
+ * @param {String} shipType The ship type
+ * @param {String} shipDirection The ship direction
+ * @param {GameBoard} gameBoard The GameBoard which we're checking
+ * @returns true if coordinates valid, false if conficts
+ */
+function checkCoordinatesValid(x, y, shipType, shipDirection, gameBoard) {
+    // Check if it overflows
+    let isVertical = false;
+    if (shipDirection === "vertical") {
+        isVertical = true;
+    } else if (shipDirection === "horizontal") {
+        isVertical = false;
+    } else {
+        isVertical = null;
+    }
+    let shipLength = lookUpShipSize(shipType + "-" + shipDirection);
+    let verticalShipIsSmallEnough = !(isVertical && (y > (BOARD_SIZE - shipLength + 1)));
+    let horizontalShipIsSmallEnough = !(!isVertical && (x > (BOARD_SIZE - shipLength + 1)));
+    // Check if it overlaps
+    let isOverlapping = false;
+    for (let overlappingShip of gameBoard.getShips()) {
+        if (checkOverlap(x, y, shipDirection, shipLength, overlappingShip.getX(), overlappingShip.getY(), overlappingShip.getDirection(), overlappingShip.getLength())) {
+            isOverlapping = true;
+        }
+    }
+
+    if (verticalShipIsSmallEnough && horizontalShipIsSmallEnough && !isOverlapping) {
+        console.log(x + " " + y + " " + shipDirection);
+        return true; // cooridnates are valid
+    } else {
+        return false; // coordinates are invalid
+    }
+}
+
+function buildAttackBoard() {
+    removeAllChildNodes(playerOneContainer);
     for (let i = 0; i <= BOARD_SIZE; i++) {
         for (let j = 0; j <= BOARD_SIZE; j++) {
             const square = document.createElement("div");
@@ -415,31 +575,10 @@ confirmPlacementBtn.addEventListener("click", (e) => {
             playerOneContainer.appendChild(square);
         }
     }
+}
 
-    // Send hits in a loop
-});
+function vsPlayerAction() {
 
-function addShipsToGameBoard() {
-    let squares = document.getElementsByClassName("square");
-    for (let square of squares) {
-        if (square.hasChildNodes()) {
-            let x = Number(square.id.split("-")[0]);
-            let y = Number(square.id.split("-")[1]);
-            let shipElement = square.children[0];
-            let shipType = shipElement.id.split("-")[0];
-            let shipDirection = shipElement.id.split("-")[1];
-            let shipSize = lookUpShipSize(shipType + "-" + shipDirection);
-
-            let isVertical = false;
-            if (shipDirection === "vertical") {
-                isVertical = true;
-            } else if (shipDirection === "horizontal") {
-                isVertical = false;
-            }
-
-            playerOneBoard.placeShip([x, y], isVertical, shipSize);
-        }
-    }
 }
 
 function removeAllChildNodes(parent) {
