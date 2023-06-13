@@ -2,7 +2,7 @@ import { Player } from "./Player.js";
 
 const BOARD_SIZE = 10;
 
-const playerOneContainer = document.getElementById("p1-container");
+const upperPlayerContainer = document.getElementById("upper-player-container");
 const vsPhaseContainer = document.getElementById("vs-phase")
 const gamePhaseContainer = document.getElementById("game-phase");
 const choosingPhaseContainer = document.getElementById("choosing-phase");
@@ -41,7 +41,7 @@ vsComputerBtn.addEventListener("click", (e) => {
     vsPhaseContainer.style.display = "none";
 
     // Let them choose their ships
-    createStartingGrid(playerOneContainer);
+    createStartingGrid(upperPlayerContainer);
 });
 
 function createStartingGrid(playerContainer) {
@@ -540,7 +540,7 @@ function checkCoordinatesValid(x, y, shipType, shipDirection, gameBoard) {
 }
 
 function buildAttackBoard() {
-    removeAllChildNodes(playerOneContainer);
+    removeAllChildNodes(upperPlayerContainer);
     for (let i = 0; i <= BOARD_SIZE; i++) {
         for (let j = 0; j <= BOARD_SIZE; j++) {
             const square = document.createElement("div");
@@ -572,7 +572,7 @@ function buildAttackBoard() {
                 }, { signal });
             }
 
-            playerOneContainer.appendChild(square);
+            upperPlayerContainer.appendChild(square);
         }
     }
 }

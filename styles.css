@@ -16,12 +16,13 @@ body {
 }
 
 #game-phase {
-    display: flex;
+    display: none;
+    /* display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: center; */
 }
 
-#p1-container {
+#upper-player-container {
     display: grid;
     grid-gap: .5px;
     grid-template-columns: repeat(11, 30.6px);
