@@ -196,7 +196,6 @@ function createShip(id, imageURL, width, height) {
     ship.style.backgroundImage = `url('${imageURL}')`;
     ship.style.width = width;
     ship.style.height = height;
-    ship.classList.add("select-ship");
     return ship;
 }
 
@@ -211,6 +210,7 @@ function createShip(id, imageURL, width, height) {
 // function createShipForBottom(id, direction, imageURL, width, height) {
 function createShipForBottom(id, imageURL, width, height) {
     const ship = createShip(id, imageURL, width, height);
+    ship.classList.add("select-ship");
 
     ship.addEventListener("click", (e) => {
         activeShip = ship;
@@ -229,7 +229,7 @@ function createShipForBottom(id, imageURL, width, height) {
 */
 function createShipForBoardOverlay(id, imageURL, width, height) {
     const ship = createShip(id, imageURL, width, height);
-
+    
     return ship;
 }
 
