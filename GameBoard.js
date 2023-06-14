@@ -28,8 +28,10 @@ export class GameBoard {
      * @param {Array} coordinates is an array of coordinates in [x, y] form
      * @param {Boolean} isVertical true if ship is vertical, false for horizontal
      * @param {Integer} length is the length of the ship
+     * @param {Array} imgInfo is an array of some info for the img of this ship.
+     * [0] is the url, [1] is the width (px), [2] is the height (px)
      */
-    placeShip(coordinates, isVertical, length) {
+    placeShip(coordinates, isVertical, length, shipType, imgInfo) {
         // check for zero or less coordinates
         if (coordinates[0] <= 0 || coordinates[1] <= 0) {
             throw new Error("placeShip: cannot place ship at [" + coordinates[0] + ", " + coordinates[1] + "]");
@@ -45,7 +47,7 @@ export class GameBoard {
             throw new Error("placeShip: cannot palce horizontal ship at [" + coordinates[0] + ", " + coordinates[1] + "]");
         }
 
-        this.#ships.push(new Ship(coordinates, isVertical, length));
+        this.#ships.push(new Ship(coordinates, isVertical, length, shipType, imgInfo));
     }
 
     /**
