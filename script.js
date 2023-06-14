@@ -660,9 +660,20 @@ function buildLowerDisplayBoard(playerBoard) {
     }
 
     for (let ship of playerBoard.getShips()) {
-        const ship = createShip(ship.getShipType(), ship.getURL(), ship.getImgWidth(), ship.getImgHeight());
+        const newShip = createShip(ship.getShipType(), ship.getURL(), ship.getImgWidth(), ship.getImgHeight());
 
-        
+        // Loop through the squares to place the ship
+        let currentChild = 0;
+        for (let i = 0; i <= BOARD_SIZE; i++) {
+            for (let j = 0; j <= BOARD_SIZE; j++) {
+                if (playerBoard.compareArrays(ship.getCoordinates(), [j, i])) {
+                    lowerPlayerContainer.children[currentChild].appendChild(newShip);
+                    break;
+                }
+
+                currentChild++;
+            }
+        }
     }
     // Add ships to the grid
 }
