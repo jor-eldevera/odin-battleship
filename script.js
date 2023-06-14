@@ -1,8 +1,12 @@
+// import { create } from "yallist";
 import { Player } from "./Player.js";
 
+const OCEAN_URL = "oceangrid_final.png";
+const RADAR_URL = "radargrid_final.png";
 const BOARD_SIZE = 10;
 
 const upperPlayerContainer = document.getElementById("upper-player-container");
+const lowerPlayerContainer = document.getElementById("lower-player-container");
 const vsPhaseContainer = document.getElementById("vs-phase")
 const gamePhaseContainer = document.getElementById("game-phase");
 const choosingPhaseContainer = document.getElementById("choosing-phase");
@@ -92,7 +96,7 @@ function createStartingGrid(playerContainer) {
                             }
     
                             // finally add the new ship
-                            const newShip = createShipForBoardOverlay(newShipID, shipDirection, imageURL, width, height);
+                            const newShip = createShipForBoardOverlay(newShipID, imageURL, width, height);
                             square.appendChild(newShip);
 
                             // if five ships are placed, move on to the next stage
@@ -143,57 +147,55 @@ addVerticalShipsToBottom();
 function addVerticalShipsToBottom() {
     removeAllChildNodes(shipsContainer);
     
-    const patrolVertical = createShipForBottom("patrol-vertical", "vertical", "Ships/patrol_vertical.png", "32px", "62px");
+    const patrolVertical = createShipForBottom("patrol-vertical", "Ships/patrol_vertical.png", "32px", "62px");
     shipsContainer.appendChild(patrolVertical);
 
-    const destroyerVertical = createShipForBottom("destroyer-vertical", "vertical", "Ships/destroyer_vertical.png", "32px", "93px");
+    const destroyerVertical = createShipForBottom("destroyer-vertical", "Ships/destroyer_vertical.png", "32px", "93px");
     shipsContainer.appendChild(destroyerVertical);
 
-    const submarineVertical = createShipForBottom("submarine-vertical", "vertical", "Ships/submarine_vertical.png", "31px", "93px");
+    const submarineVertical = createShipForBottom("submarine-vertical", "Ships/submarine_vertical.png", "31px", "93px");
     shipsContainer.appendChild(submarineVertical);
 
-    const battleshipVertical = createShipForBottom("battleship-vertical", "vertical", "Ships/battleship_vertical.png", "31px", "125px");
+    const battleshipVertical = createShipForBottom("battleship-vertical", "Ships/battleship_vertical.png", "31px", "125px");
     shipsContainer.appendChild(battleshipVertical);
 
-    const carrierVertical = createShipForBottom("carrier-vertical", "vertical", "Ships/carrier_vertical.png", "32px", "155px");
+    const carrierVertical = createShipForBottom("carrier-vertical", "Ships/carrier_vertical.png", "32px", "155px");
     shipsContainer.appendChild(carrierVertical);
 }
 
 function addHorizontalShipsToBottom() {
     removeAllChildNodes(shipsContainer);
 
-    const patrolHorizontal = createShipForBottom("patrol-horizontal", "horizontal", "Ships/patrol_horizontal.png", "63px", "32px");
+    const patrolHorizontal = createShipForBottom("patrol-horizontal", "Ships/patrol_horizontal.png", "63px", "32px");
     shipsContainer.appendChild(patrolHorizontal);
 
-    const destroyerHorizontal = createShipForBottom("destroyer-horizontal", "horizontal", "Ships/destroyer_horizontal.png", "93px", "32px");
+    const destroyerHorizontal = createShipForBottom("destroyer-horizontal", "Ships/destroyer_horizontal.png", "93px", "32px");
     shipsContainer.appendChild(destroyerHorizontal);
 
-    const submarineHorizontal = createShipForBottom("submarine-horizontal", "horizontal", "Ships/submarine_horizontal.png", "94px", "32px");
+    const submarineHorizontal = createShipForBottom("submarine-horizontal", "Ships/submarine_horizontal.png", "94px", "32px");
     shipsContainer.appendChild(submarineHorizontal);
 
-    const battleshipHorizontal = createShipForBottom("battleship-horizontal", "horizontal", "Ships/battleship_horizontal.png", "124px", "32px");
+    const battleshipHorizontal = createShipForBottom("battleship-horizontal", "Ships/battleship_horizontal.png", "124px", "32px");
     shipsContainer.appendChild(battleshipHorizontal);
 
-    const carrierHorizontal = createShipForBottom("carrier-horizontal", "horizontal", "Ships/carrier_horizontal.png", "155px", "33px");
+    const carrierHorizontal = createShipForBottom("carrier-horizontal", "Ships/carrier_horizontal.png", "155px", "33px");
     shipsContainer.appendChild(carrierHorizontal);
 }
 
 /**
  * Create a ship
  * @param {String} id is the id of the element
- * @param {String} direction is the direction of the ship (either "vertical" or "horizontal")
  * @param {String} imageURL is the url of the image
  * @param {String} width is the width of the image. Must include "px"
  * @param {String} height is the height of the image. Must include "px"
  * @returns a div with the background as the imageURL and size width x height
 */
-function createShip(id, direction, imageURL, width, height) {
+function createShip(id, imageURL, width, height) {
     const ship = document.createElement("div");
     ship.id = id;
     ship.style.backgroundImage = `url('${imageURL}')`;
     ship.style.width = width;
     ship.style.height = height;
-    ship.classList.add(direction);
     ship.classList.add("select-ship");
     return ship;
 }
@@ -201,14 +203,14 @@ function createShip(id, direction, imageURL, width, height) {
 /**
  * Create a ship to be used at the bottom of the page when placing ships
  * @param {String} id is the id of the element
- * @param {String} direction is the direction of the ship (either "vertical" or "horizontal")
  * @param {String} imageURL is the url of the image
  * @param {String} width is the width of the image. Must include "px"
  * @param {String} height is the height of the image. Must include "px"
  * @returns a div with the background as the imageURL, size "width x height", and an event listener which changes the active ship 
 */
-function createShipForBottom(id, direction, imageURL, width, height) {
-    const ship = createShip(id, direction, imageURL, width, height);
+// function createShipForBottom(id, direction, imageURL, width, height) {
+function createShipForBottom(id, imageURL, width, height) {
+    const ship = createShip(id, imageURL, width, height);
 
     ship.addEventListener("click", (e) => {
         activeShip = ship;
@@ -220,14 +222,13 @@ function createShipForBottom(id, direction, imageURL, width, height) {
 /**
  * Create a ship to be used on the board when placing ships
  * @param {String} id is the id of the element
- * @param {String} direction is the direction of the ship (either "vertical" or "horizontal")
  * @param {String} imageURL is the url of the image
  * @param {String} width is the width of the image. Must include "px"
  * @param {String} height is the height of the image. Must include "px"
  * @returns a div with the background as the imageURL, size "width x height"
 */
-function createShipForBoardOverlay(id, direction, imageURL, width, height) {
-    const ship = createShip(id, direction, imageURL, width, height);
+function createShipForBoardOverlay(id, imageURL, width, height) {
+    const ship = createShip(id, imageURL, width, height);
 
     return ship;
 }
@@ -425,7 +426,10 @@ function vsComputerAction() {
 
     // Start attacking
     // Remove all squares and replace with new squares
+    upperPlayerContainer.style.backgroundImage = "url(" + RADAR_URL + ")";
     buildAttackBoard();
+    // Build lower player display
+    buildLowerDisplayBoard(playerOneBoard);
 }
 
 function addShipsToGameBoard(gameBoard) {
@@ -438,6 +442,7 @@ function addShipsToGameBoard(gameBoard) {
             let shipType = shipElement.id.split("-")[0];
             let shipDirection = shipElement.id.split("-")[1];
             let shipSize = lookUpShipSize(shipType + "-" + shipDirection);
+            let shipURL = shipElement.style.backgroundImage.slice(5, -2);
 
             let isVertical = false;
             if (shipDirection === "vertical") {
@@ -446,7 +451,7 @@ function addShipsToGameBoard(gameBoard) {
                 isVertical = false;
             }
 
-            gameBoard.placeShip([x, y], isVertical, shipSize);
+            gameBoard.placeShip([x, y], isVertical, shipSize, shipType, [shipURL, shipElement.style.width, shipElement.style.height]);
         }
     }
 }
@@ -458,23 +463,73 @@ function addShipsToGameBoard(gameBoard) {
 function placeShipsRandomly(gameBoard) {
     let shipType = "patrol";
     let randomCoordinatesAndDirection = generateRandomCoordinates(shipType, gameBoard);
-    gameBoard.placeShip(randomCoordinatesAndDirection[0], randomCoordinatesAndDirection[1], lookUpShipSize(shipType));
+    let shipImgInfo = lookupImgInfo(shipType, randomCoordinatesAndDirection[1]);
+    gameBoard.placeShip(randomCoordinatesAndDirection[0], randomCoordinatesAndDirection[1], lookUpShipSize(shipType), shipType, shipImgInfo);
 
     shipType = "destroyer";
     randomCoordinatesAndDirection = generateRandomCoordinates(shipType, gameBoard);
-    gameBoard.placeShip(randomCoordinatesAndDirection[0], randomCoordinatesAndDirection[1], lookUpShipSize(shipType));
+    shipImgInfo = lookupImgInfo(shipType, randomCoordinatesAndDirection[1]);
+    gameBoard.placeShip(randomCoordinatesAndDirection[0], randomCoordinatesAndDirection[1], lookUpShipSize(shipType), shipType, shipImgInfo);
 
     shipType = "submarine";
     randomCoordinatesAndDirection = generateRandomCoordinates(shipType, gameBoard);
-    gameBoard.placeShip(randomCoordinatesAndDirection[0], randomCoordinatesAndDirection[1], lookUpShipSize(shipType));
+    shipImgInfo = lookupImgInfo(shipType, randomCoordinatesAndDirection[1]);
+    gameBoard.placeShip(randomCoordinatesAndDirection[0], randomCoordinatesAndDirection[1], lookUpShipSize(shipType), shipType, shipImgInfo);
 
     shipType = "battleship";
     randomCoordinatesAndDirection = generateRandomCoordinates(shipType, gameBoard);
-    gameBoard.placeShip(randomCoordinatesAndDirection[0], randomCoordinatesAndDirection[1], lookUpShipSize(shipType));
+    shipImgInfo = lookupImgInfo(shipType, randomCoordinatesAndDirection[1]);
+    gameBoard.placeShip(randomCoordinatesAndDirection[0], randomCoordinatesAndDirection[1], lookUpShipSize(shipType), shipType, shipImgInfo);
 
     shipType = "carrier";
     randomCoordinatesAndDirection = generateRandomCoordinates(shipType, gameBoard);
-    gameBoard.placeShip(randomCoordinatesAndDirection[0], randomCoordinatesAndDirection[1], lookUpShipSize(shipType));
+    shipImgInfo = lookupImgInfo(shipType, randomCoordinatesAndDirection[1]);
+    gameBoard.placeShip(randomCoordinatesAndDirection[0], randomCoordinatesAndDirection[1], lookUpShipSize(shipType), shipType, shipImgInfo);
+}
+
+function lookupImgInfo(shipType, shipDirection) {
+    let fullShipRequest = shipType + "-";
+    if (shipDirection === true || shipDirection === "vertical") {
+        fullShipRequest += "vertical";
+    } else if (shipDirection === false || shipDirection === "horizontal") {
+        fullShipRequest += "horizontal";
+    }
+
+    let shipInfo;
+    switch (fullShipRequest) {
+        case "patrol-vertical":
+            shipInfo = ["Ships/patrol_vertical.png", "32px", "62px"];
+            break;
+        case "submarine-vertical":
+            shipInfo = ["Ships/submarine_vertical.png", "31px", "93px"];
+            break;
+        case "destroyer-vertical":
+            shipInfo = ["Ships/destroyer_vertical.png", "32px", "93px"];
+            break;
+        case "battleship-vertical":
+            shipInfo = ["Ships/battleship_vertical.png", "31px", "125px"];
+            break;
+        case "carrier-vertical":
+            shipInfo = ["Ships/carrier_vertical.png", "32px", "155px"];
+            break;
+        case "patrol-horizontal":
+            shipInfo = ["Ships/patrol_horizontal.png", "63px", "32px"];
+            break;
+        case "destroyer-horizontal":
+            shipInfo = ["Ships/destroyer_horizontal.png", "93px", "32px"];
+            break;
+        case "submarine-horizontal":
+            shipInfo = ["Ships/submarine_horizontal.png", "94px", "32px"];
+            break;
+        case "battleship-horizontal":
+            shipInfo = ["Ships/battleship_horizontal.png", "124px", "32px"];
+            break;
+        case "carrier-horizontal":
+            shipInfo = ["Ships/carrier_horizontal.png", "155px", "33px"];
+            break;
+    }
+
+    return shipInfo;
 }
 
 function generateRandomCoordinates(shipType, gameBoard) {
@@ -539,6 +594,10 @@ function checkCoordinatesValid(x, y, shipType, shipDirection, gameBoard) {
     }
 }
 
+/**
+ * Adds squares to the upperPlayerContainer that send hits to the playerTwoBoard
+ * and check if all ships are sunk when clicked on.
+ */
 function buildAttackBoard() {
     removeAllChildNodes(upperPlayerContainer);
     for (let i = 0; i <= BOARD_SIZE; i++) {
@@ -575,6 +634,37 @@ function buildAttackBoard() {
             upperPlayerContainer.appendChild(square);
         }
     }
+}
+
+/**
+ * Displays ships on the lower board
+ */
+function buildLowerDisplayBoard(playerBoard) {
+    lowerPlayerContainer.style.display = "grid";
+    lowerPlayerContainer.style.gap = ".5px";
+    lowerPlayerContainer.style.gridTemplateColumns = "repeat(11, 30.6px)";
+    lowerPlayerContainer.style.gridTemplateRows = "repeat(11, 30.6px)";
+    lowerPlayerContainer.style.width = "342px";
+    lowerPlayerContainer.style.height = "342px";
+    lowerPlayerContainer.style.backgroundImage = "url(" + OCEAN_URL + ")";
+
+    // Add divs to the grid
+    for (let i = 0; i <= BOARD_SIZE; i++) {
+        for (let j = 0; j <= BOARD_SIZE; j++) {
+            const square = document.createElement("div");
+            if (i !== 0 && j !== 0) {
+                square.classList.add("lower-display-square");
+            }
+            lowerPlayerContainer.appendChild(square);
+        }
+    }
+
+    for (let ship of playerBoard.getShips()) {
+        const ship = createShip(ship.getShipType(), ship.getURL(), ship.getImgWidth(), ship.getImgHeight());
+
+        
+    }
+    // Add ships to the grid
 }
 
 function vsPlayerAction() {
