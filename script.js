@@ -620,8 +620,8 @@ function buildAttackBoard() {
                             square.appendChild(tokenSquare);
                         }
     
-                        let allShipsSunk = playerTwoBoard.checkAllShipsSunk();
-                        if (allShipsSunk) {
+                        let playerTwoAllShipsSunk = playerTwoBoard.checkAllShipsSunk();
+                        if (playerTwoAllShipsSunk) {
                             // Abort all event listeners
                             controller.abort();
     
@@ -634,6 +634,17 @@ function buildAttackBoard() {
     
                         // Computers turn
                         computerAttackPlayerBoard(playerOneBoard);
+                        let playerOneAllShipsSunk = playerOneBoard.checkAllShipsSunk();
+                        if (playerOneAllShipsSunk && !playerTwoAllShipsSunk) {
+                            // Abort all event listeners
+                            controller.abort();
+    
+                            battlePhaseContainer.style.display = "block";
+                            // Display winner message
+                            winnerText.innerText = "You have lost!";
+                            // Option to restart game
+                            newGameBtn.disabled = false;
+                        }
                     }
                 }, { signal });
             }
