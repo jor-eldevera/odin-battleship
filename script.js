@@ -1,4 +1,5 @@
 // import { create } from "yallist";
+import { GameBoard } from "./GameBoard.js";
 import { Player } from "./Player.js";
 
 const OCEAN_URL = "oceangrid_final.png";
@@ -306,9 +307,6 @@ function checkOverlapAllShips(i, j, shipType, shipDirection) {
     return false;
 }
 
-// checkOverlap(5, 7, "horizontal", 3, 7, 3, "vertical", 5);
-// checkOverlap(7, 3, "vertical", 5, 5, 7, "horizontal", 3);
-
 /**
  * Checks if two ships are overlapping
  * @param {Number} x The x coordinate of ship 1
@@ -462,27 +460,27 @@ function addShipsToGameBoard(gameBoard) {
  */
 function placeShipsRandomly(gameBoard) {
     let shipType = "patrol";
-    let randomCoordinatesAndDirection = generateRandomCoordinates(shipType, gameBoard);
+    let randomCoordinatesAndDirection = generateRandomCoordinatesForShip(shipType, gameBoard);
     let shipImgInfo = lookupImgInfo(shipType, randomCoordinatesAndDirection[1]);
     gameBoard.placeShip(randomCoordinatesAndDirection[0], randomCoordinatesAndDirection[1], lookUpShipSize(shipType), shipType, shipImgInfo);
 
     shipType = "destroyer";
-    randomCoordinatesAndDirection = generateRandomCoordinates(shipType, gameBoard);
+    randomCoordinatesAndDirection = generateRandomCoordinatesForShip(shipType, gameBoard);
     shipImgInfo = lookupImgInfo(shipType, randomCoordinatesAndDirection[1]);
     gameBoard.placeShip(randomCoordinatesAndDirection[0], randomCoordinatesAndDirection[1], lookUpShipSize(shipType), shipType, shipImgInfo);
 
     shipType = "submarine";
-    randomCoordinatesAndDirection = generateRandomCoordinates(shipType, gameBoard);
+    randomCoordinatesAndDirection = generateRandomCoordinatesForShip(shipType, gameBoard);
     shipImgInfo = lookupImgInfo(shipType, randomCoordinatesAndDirection[1]);
     gameBoard.placeShip(randomCoordinatesAndDirection[0], randomCoordinatesAndDirection[1], lookUpShipSize(shipType), shipType, shipImgInfo);
 
     shipType = "battleship";
-    randomCoordinatesAndDirection = generateRandomCoordinates(shipType, gameBoard);
+    randomCoordinatesAndDirection = generateRandomCoordinatesForShip(shipType, gameBoard);
     shipImgInfo = lookupImgInfo(shipType, randomCoordinatesAndDirection[1]);
     gameBoard.placeShip(randomCoordinatesAndDirection[0], randomCoordinatesAndDirection[1], lookUpShipSize(shipType), shipType, shipImgInfo);
 
     shipType = "carrier";
-    randomCoordinatesAndDirection = generateRandomCoordinates(shipType, gameBoard);
+    randomCoordinatesAndDirection = generateRandomCoordinatesForShip(shipType, gameBoard);
     shipImgInfo = lookupImgInfo(shipType, randomCoordinatesAndDirection[1]);
     gameBoard.placeShip(randomCoordinatesAndDirection[0], randomCoordinatesAndDirection[1], lookUpShipSize(shipType), shipType, shipImgInfo);
 }
@@ -532,7 +530,7 @@ function lookupImgInfo(shipType, shipDirection) {
     return shipInfo;
 }
 
-function generateRandomCoordinates(shipType, gameBoard) {
+function generateRandomCoordinatesForShip(shipType, gameBoard) {
     let shipDirection;
     let isCoordinatesValid = false;
     let x;
@@ -607,31 +605,87 @@ function buildAttackBoard() {
                 square.classList.add("attack-square");
                 // Add new event listeners that call GameBoard's recieveAttack
                 square.addEventListener("click", function shootBoard() {
-                    let isHit = playerTwoBoard.recieveAttack([j, i]);
-
-                    if (isHit) {
-                        // Add hit class so that the background is a hit marker
-                        square.classList.add("hit");
-                    } else {
-                        // Add miss class so that the background is a miss token
-                        square.classList.add("miss");
-                    }
-
-                    let allShipsSunk = playerTwoBoard.checkAllShipsSunk();
-                    if (allShipsSunk) {
-                        // Abort all event listeners
-                        controller.abort();
-
-                        battlePhaseContainer.style.display = "block";
-                        // Display winner message
-                        winnerText.innerText = "You have won!";
-                        // Option to restart game
-                        newGameBtn.disabled = false;
+                    if (!square.children[0]) { // This line prevents multiple attack events on one square
+                        let isHit = playerTwoBoard.recieveAttack([j, i]);
+    
+                        if (isHit) {
+                            // Create a hit element and append it to this square
+                            let tokenSquare = document.createElement("div");
+                            tokenSquare.classList.add("hit");
+                            square.appendChild(tokenSquare);
+                        } else {
+                            // Create a miss element and append it to this square
+                            let tokenSquare = document.createElement("div");
+                            tokenSquare.classList.add("miss");
+                            square.appendChild(tokenSquare);
+                        }
+    
+                        let allShipsSunk = playerTwoBoard.checkAllShipsSunk();
+                        if (allShipsSunk) {
+                            // Abort all event listeners
+                            controller.abort();
+    
+                            battlePhaseContainer.style.display = "block";
+                            // Display winner message
+                            winnerText.innerText = "You have won!";
+                            // Option to restart game
+                            newGameBtn.disabled = false;
+                        }
+    
+                        // Computers turn
+                        computerAttackPlayerBoard(playerOneBoard);
                     }
                 }, { signal });
             }
 
             upperPlayerContainer.appendChild(square);
+        }
+    }
+}
+
+function computerAttackPlayerBoard(gameBoard) {
+    // Generate a new shot
+    let shot = generateRandomShot(gameBoard);
+    
+    // Shoot the GameBoard
+    let isHit = gameBoard.recieveAttack(shot);
+
+    // Update the lower player container
+    shootLowerPlayerContainer(shot, isHit);
+}
+
+/**
+ * Generates a random shot that has not been fired on this GameBoard yet
+ * @param {GameBoard} gameBoard is the GameBoard who the shot is being fired on
+ * @returns an array of coordinates [x, y]
+ */
+function generateRandomShot(gameBoard) {
+    let x = Math.floor(Math.random() * 10) + 1;
+    let y = Math.floor(Math.random() * 10) + 1;
+    while (gameBoard.checkIfShotAlreadyMade([x, y])) {
+        x = Math.floor(Math.random() * 10) + 1;
+        y = Math.floor(Math.random() * 10) + 1;
+    }
+    
+    return [x, y];
+}
+
+function shootLowerPlayerContainer(shot, isHit) {
+    let currentChild = 0;
+    for (let i = 0; i <= BOARD_SIZE; i++) {
+        for (let j = 0; j <= BOARD_SIZE; j++) {
+            if (GameBoard.compareArrays(shot, [j, i])) {
+                let shotToken = document.createElement("div");
+                if (isHit) {
+                    shotToken.classList.add("hit");
+                } else {
+                    shotToken.classList.add("miss");
+                }
+                // shotToken.style.height = "30px";
+                lowerPlayerContainer.children[currentChild].appendChild(shotToken);
+            }
+
+            currentChild++;
         }
     }
 }
@@ -661,12 +715,12 @@ function buildLowerDisplayBoard(playerBoard) {
 
     for (let ship of playerBoard.getShips()) {
         const newShip = createShip(ship.getShipType(), ship.getURL(), ship.getImgWidth(), ship.getImgHeight());
-
+        newShip.classList.add("lower-player-container-ship");
         // Loop through the squares to place the ship
         let currentChild = 0;
         for (let i = 0; i <= BOARD_SIZE; i++) {
             for (let j = 0; j <= BOARD_SIZE; j++) {
-                if (playerBoard.compareArrays(ship.getCoordinates(), [j, i])) {
+                if (GameBoard.compareArrays(ship.getCoordinates(), [j, i])) {
                     lowerPlayerContainer.children[currentChild].appendChild(newShip);
                     break;
                 }
@@ -675,7 +729,6 @@ function buildLowerDisplayBoard(playerBoard) {
             }
         }
     }
-    // Add ships to the grid
 }
 
 function vsPlayerAction() {
