@@ -13,6 +13,7 @@ const gamePhaseContainer = document.getElementById("game-phase");
 const choosingPhaseContainer = document.getElementById("choosing-phase");
 const battlePhaseContainer = document.getElementById("battle-phase");
 const shipsContainer = document.getElementById("ships");
+const medianScreenContainer = document.getElementById("median-screen");
 
 const vsComputerBtn = document.getElementById("play-vs-computer-btn");
 const vsPlayerBtn = document.getElementById("play-vs-player-btn");
@@ -21,6 +22,7 @@ const confirmPlacementBtn = document.getElementById("confirm-placement-btn");
 confirmPlacementBtn.disabled = true;
 const newGameBtn = document.getElementById("new-game-btn");
 newGameBtn.disabled = true;
+const passReadyBtn = document.getElementById("pass-ready-btn");
 
 const winnerText = document.getElementById("winner-text");
 const playersTurnText = document.getElementById("players-turn-text");
@@ -793,13 +795,22 @@ function vsPlayerActionTwo() {
     vsPlayerGameLoop();
 }
 
+// Promise for clicking a square on the board
 let squareClickedPromise;
-
 function waitForSquareClick() {
     return new Promise(resolve => {
         squareClickedPromise = resolve;
     });
 }
+
+// Promise for clicking the median screen
+let medianClickedPromise;
+function waitForMedianClick() {
+    return new Promise(resolve => {
+        medianClickedPromise = resolve;
+    });
+}
+
 async function vsPlayerGameLoop() {
     let playerOneAllShipsSunk = false;
     let playerTwoAllShipsSunk = false;
@@ -820,18 +831,39 @@ async function vsPlayerGameLoop() {
 
         playerOneAllShipsSunk = playerOneBoard.checkAllShipsSunk();
         playerTwoAllShipsSunk = playerTwoBoard.checkAllShipsSunk();
-
+        
+        if (playerOneAllShipsSunk) {
+            winnerText.innerText = "Player two wins!";
+        }
+        if (playerTwoAllShipsSunk) {
+            winnerText.innerText = "Player one wins!";
+        }
+        if (playerOneAllShipsSunk || playerTwoAllShipsSunk) {
+            controller.abort();
+            battlePhaseContainer.style.display = "block";
+            newGameBtn.disabled = false;
+            break;        
+        }
+        
+        // Put up the median screen and wait for median screen button to be clicked
+        buildMedianScreen();
+        await waitForMedianClick();
         isPlayerOnesTurn = !isPlayerOnesTurn;
     }
-    controller.abort();
-    battlePhaseContainer.style.display = "block";
-    newGameBtn.disabled = false;
-    if (playerOneAllShipsSunk) {
-        winnerText.innerText = "Player two wins!";
-    }
-    if (playerTwoAllShipsSunk) {
-        winnerText.innerText = "Player one wins!";
-    }
+}
+
+function buildMedianScreen() {
+    medianScreenContainer.style.display = "flex";
+    medianScreenContainer.style.flexDirection = "column";
+    medianScreenContainer.style.alignItems = "center";
+
+    gamePhaseContainer.style.display = "none";
+
+    passReadyBtn.addEventListener("click", (e) => {
+        gamePhaseContainer.style.display = "flex";
+        medianScreenContainer.style.display = "none";
+        medianClickedPromise();
+    })
 }
 
 /**
