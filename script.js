@@ -373,9 +373,9 @@ function checkOverlap(x, y, shipDirection, shipLength, j, i, overlappingShipDire
         // Check if ships are horizontal
         if (shipDirection === 'horizontal') {
             // Check if the horizontal segments overlap
-            if (i === y && 
-                (j + shipLength > x) && 
-                (j < x + overlappingShipSize)) {
+            if (i === y &&
+                (j - shipLength < x) && 
+                (j > x - overlappingShipSize)) {
                 // console.log("x=" + x + " y=" + y + " j=" + j + " i=" + i + " shipLength=" + shipLength + " overlappingShipSize=" + overlappingShipSize);
                 console.log("overlap 3");
                 return true; // Overlapping ships
@@ -384,9 +384,9 @@ function checkOverlap(x, y, shipDirection, shipLength, j, i, overlappingShipDire
         // Check if ships are vertical
         else if (shipDirection === 'vertical') {
             // Check if the vertical segments overlap
-            if (j === x && 
-                i + shipLength > y && 
-                i < y + overlappingShipSize) {
+            if (j === x &&
+                i - shipLength < y && 
+                i > y - overlappingShipSize) {
                 // console.log("x=" + x + " y=" + y + " j=" + j + " i=" + i + " shipLength=" + shipLength + " overlappingShipSize=" + overlappingShipSize);
                 console.log("overlap 4");
                 return true; // Overlapping ships
