@@ -111,6 +111,27 @@ export class GameBoard {
         return false;
     }
 
+    /**
+     * Checks what kind of shot was shot at the passed coordinates
+     * @param {Array} coordinates is an array in [x, y] form
+     * @returns "hit" if the shot at these coordinates is a hit, "miss", or "none"
+     */
+    getShotTypeAtCoordinates(coordinates) {
+        for (let shot of this.#hits) {
+            if (GameBoard.compareArrays(shot, coordinates)) {
+                return "hit";
+            }
+        }
+        
+        for (let shot of this.#misses) {
+            if (GameBoard.compareArrays(shot, coordinates)) {
+                return "miss";
+            }
+        }
+
+        return "none";
+    }
+
     static compareArrays(a, b) {
         if (a.length !== b.length) return false;
         else {
