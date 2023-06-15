@@ -67,7 +67,7 @@ export class GameBoard {
                 }
 
                 // if the attack is on the ship, record a hit
-                if (this.compareArrays(attackCoordinates, tempCoordinates)) {
+                if (GameBoard.compareArrays(attackCoordinates, tempCoordinates)) {
                     ship.hit();
                     this.#hits.push(tempCoordinates);
                     return true;
@@ -90,7 +90,28 @@ export class GameBoard {
         return true;
     }
 
-    compareArrays(a, b) {
+    /**
+     * Checks if the coordinates passed are already in the hits or misses arrays
+     * @param {Array} coordinates is an array of coordinates [x, y]
+     * @returns true if shot was made, false if shot is new
+     */
+    checkIfShotAlreadyMade(coordinates) {
+        for (let shot of this.#hits) {
+            if (GameBoard.compareArrays(shot, coordinates)) {
+                return true;
+            }
+        }
+        
+        for (let shot of this.#misses) {
+            if (GameBoard.compareArrays(shot, coordinates)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    static compareArrays(a, b) {
         if (a.length !== b.length) return false;
         else {
           // Comparing each element of your array
@@ -101,5 +122,5 @@ export class GameBoard {
           }
           return true;
         }
-      }
+    }
 }
