@@ -23,6 +23,7 @@ const newGameBtn = document.getElementById("new-game-btn");
 newGameBtn.disabled = true;
 
 const winnerText = document.getElementById("winner-text");
+const playersTurnText = document.getElementById("players-turn-text");
 
 let verticalDirection = true; // true if vertical, false if horizontal. used when placing ships
 let activeShip;
@@ -32,6 +33,10 @@ let playerOne = new Player();
 let playerTwo = new Player();
 let playerOneBoard = playerOne.getGameboard();
 let playerTwoBoard = playerTwo.getGameboard();
+
+newGameBtn.addEventListener("click", (e) => {
+    location.reload();
+})
 
 vsComputerBtn.addEventListener("click", (e) => {
     gameType = "computer";
@@ -729,6 +734,8 @@ function buildLowerDisplayBoard(playerBoard) {
     lowerPlayerContainer.style.height = "342px";
     lowerPlayerContainer.style.backgroundImage = "url(" + OCEAN_URL + ")";
 
+    removeAllChildNodes(lowerPlayerContainer);
+
     // Add divs to the grid
     for (let i = 0; i <= BOARD_SIZE; i++) {
         for (let j = 0; j <= BOARD_SIZE; j++) {
@@ -779,33 +786,51 @@ function vsPlayerActionTwo() {
     // Hide the choosing phase container (ships)
     choosingPhaseContainer.style.display = "none";
 
+    // Set the background image of the upper container to radar
     upperPlayerContainer.style.backgroundImage = "url(" + RADAR_URL + ")";
+
     // Start attacking
-    // vsPlayerGameLoop();
-
-
-    // Remove all squares and replace with new squares
-    buildAttackBoardVsPlayer(playerTwoBoard);
-    // Build lower player display
-    buildLowerDisplayBoard(playerOneBoard);
+    vsPlayerGameLoop();
 }
 
-function vsPlayerGameLoop() {
+let squareClickedPromise;
+
+function waitForSquareClick() {
+    return new Promise(resolve => {
+        squareClickedPromise = resolve;
+    });
+}
+async function vsPlayerGameLoop() {
     let playerOneAllShipsSunk = false;
     let playerTwoAllShipsSunk = false;
     let isPlayerOnesTurn = true;
 
     while (!playerOneAllShipsSunk && !playerTwoAllShipsSunk) {
         if (isPlayerOnesTurn) {
+            playersTurnText.innerText = "Player one's turn";
             buildAttackBoardVsPlayer(playerTwoBoard);
             buildLowerDisplayBoard(playerOneBoard);
         } else {
+            playersTurnText.innerText = "Player two's turn";
             buildAttackBoardVsPlayer(playerOneBoard);
             buildLowerDisplayBoard(playerTwoBoard);
         }
 
+        await waitForSquareClick();
+
         playerOneAllShipsSunk = playerOneBoard.checkAllShipsSunk();
         playerTwoAllShipsSunk = playerTwoBoard.checkAllShipsSunk();
+
+        isPlayerOnesTurn = !isPlayerOnesTurn;
+    }
+    controller.abort();
+    battlePhaseContainer.style.display = "block";
+    newGameBtn.disabled = false;
+    if (playerOneAllShipsSunk) {
+        winnerText.innerText = "Player two wins!";
+    }
+    if (playerTwoAllShipsSunk) {
+        winnerText.innerText = "Player one wins!";
     }
 }
 
@@ -823,21 +848,26 @@ function buildAttackBoardVsPlayer(gameBoard) {
                 // Add new event listeners that call GameBoard's recieveAttack
                 square.addEventListener("click", function shootBoard() {
                     if (!square.children[0]) { // This line prevents multiple attack events on one square
-                        let isHit = gameBoard.recieveAttack([j, i]);
-    
-                        if (isHit) {
-                            // Create a hit element and append it to this square
-                            let tokenSquare = document.createElement("div");
-                            tokenSquare.classList.add("hit");
-                            square.appendChild(tokenSquare);
-                        } else {
-                            // Create a miss element and append it to this square
-                            let tokenSquare = document.createElement("div");
-                            tokenSquare.classList.add("miss");
-                            square.appendChild(tokenSquare);
-                        }
+                        gameBoard.recieveAttack([j, i]);
                     }
-                });
+
+                    squareClickedPromise();
+                }, { signal });
+
+                // If this square has a token, add it as a child
+                if (gameBoard.checkIfShotAlreadyMade([j, i])) {
+                    if (gameBoard.getShotTypeAtCoordinates([j, i]) === "hit") {
+                        // Create a hit element and append it to this square
+                        let tokenSquare = document.createElement("div");
+                        tokenSquare.classList.add("hit");
+                        square.appendChild(tokenSquare);
+                    } else if (gameBoard.getShotTypeAtCoordinates([j, i]) === "miss") {
+                        // Create a miss element and append it to this square
+                        let tokenSquare = document.createElement("div");
+                        tokenSquare.classList.add("miss");
+                        square.appendChild(tokenSquare);
+                    }
+                }
             }
             upperPlayerContainer.appendChild(square);
         }
