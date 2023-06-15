@@ -49,6 +49,22 @@ vsComputerBtn.addEventListener("click", (e) => {
     createStartingGrid(upperPlayerContainer);
 });
 
+vsPlayerBtn.addEventListener("click", (e) => {
+    gameType = "player";
+    confirmPlacementAction = vsPlayerAction;
+
+    // Unveil the game-phase stuff
+    gamePhaseContainer.style.display = "flex";
+    gamePhaseContainer.style.flexDirection = "column";
+    gamePhaseContainer.style.alignItems = "center";
+
+    // Hide the vs-phase stuff
+    vsPhaseContainer.style.display = "none";
+
+    // Let them choose their ships
+    createStartingGrid(upperPlayerContainer);
+});
+
 function createStartingGrid(playerContainer) {
     removeAllChildNodes(playerContainer);
     for (let i = 0; i <= BOARD_SIZE; i++) {
@@ -422,10 +438,10 @@ function vsComputerAction() {
     // Set up computer's GameBoard
     placeShipsRandomly(playerTwoBoard);
 
+    upperPlayerContainer.style.backgroundImage = "url(" + RADAR_URL + ")";
     // Start attacking
     // Remove all squares and replace with new squares
-    upperPlayerContainer.style.backgroundImage = "url(" + RADAR_URL + ")";
-    buildAttackBoard();
+    buildAttackBoardVsComputer();
     // Build lower player display
     buildLowerDisplayBoard(playerOneBoard);
 }
@@ -596,7 +612,7 @@ function checkCoordinatesValid(x, y, shipType, shipDirection, gameBoard) {
  * Adds squares to the upperPlayerContainer that send hits to the playerTwoBoard
  * and check if all ships are sunk when clicked on.
  */
-function buildAttackBoard() {
+function buildAttackBoardVsComputer() {
     removeAllChildNodes(upperPlayerContainer);
     for (let i = 0; i <= BOARD_SIZE; i++) {
         for (let j = 0; j <= BOARD_SIZE; j++) {
@@ -743,7 +759,89 @@ function buildLowerDisplayBoard(playerBoard) {
 }
 
 function vsPlayerAction() {
+    // Add all pieces to a GameBoard
+    addShipsToGameBoard(playerOneBoard);
 
+    // Recreate the starting grid
+    createStartingGrid(upperPlayerContainer);
+
+    // Disable "confirm ship placements" button
+    confirmPlacementBtn.disabled = true;
+
+    // Change "confirm ship placements" action
+    confirmPlacementAction = vsPlayerActionTwo;
+}
+
+function vsPlayerActionTwo() {
+    // Add all pieces to a GameBoard
+    addShipsToGameBoard(playerTwoBoard);
+
+    // Hide the choosing phase container (ships)
+    choosingPhaseContainer.style.display = "none";
+
+    upperPlayerContainer.style.backgroundImage = "url(" + RADAR_URL + ")";
+    // Start attacking
+    // vsPlayerGameLoop();
+
+
+    // Remove all squares and replace with new squares
+    buildAttackBoardVsPlayer(playerTwoBoard);
+    // Build lower player display
+    buildLowerDisplayBoard(playerOneBoard);
+}
+
+function vsPlayerGameLoop() {
+    let playerOneAllShipsSunk = false;
+    let playerTwoAllShipsSunk = false;
+    let isPlayerOnesTurn = true;
+
+    while (!playerOneAllShipsSunk && !playerTwoAllShipsSunk) {
+        if (isPlayerOnesTurn) {
+            buildAttackBoardVsPlayer(playerTwoBoard);
+            buildLowerDisplayBoard(playerOneBoard);
+        } else {
+            buildAttackBoardVsPlayer(playerOneBoard);
+            buildLowerDisplayBoard(playerTwoBoard);
+        }
+
+        playerOneAllShipsSunk = playerOneBoard.checkAllShipsSunk();
+        playerTwoAllShipsSunk = playerTwoBoard.checkAllShipsSunk();
+    }
+}
+
+/**
+ * Builds the attack board (upper player container)
+ * @param {GameBoard} gameBoard is the GameBoard being shot at
+ */
+function buildAttackBoardVsPlayer(gameBoard) {
+    removeAllChildNodes(upperPlayerContainer);
+    for (let i = 0; i <= BOARD_SIZE; i++) {
+        for (let j = 0; j <= BOARD_SIZE; j++) {
+            const square = document.createElement("div");
+            if (i !== 0 && j !== 0) { // if we're not looking at the border
+                square.classList.add("attack-square");
+                // Add new event listeners that call GameBoard's recieveAttack
+                square.addEventListener("click", function shootBoard() {
+                    if (!square.children[0]) { // This line prevents multiple attack events on one square
+                        let isHit = gameBoard.recieveAttack([j, i]);
+    
+                        if (isHit) {
+                            // Create a hit element and append it to this square
+                            let tokenSquare = document.createElement("div");
+                            tokenSquare.classList.add("hit");
+                            square.appendChild(tokenSquare);
+                        } else {
+                            // Create a miss element and append it to this square
+                            let tokenSquare = document.createElement("div");
+                            tokenSquare.classList.add("miss");
+                            square.appendChild(tokenSquare);
+                        }
+                    }
+                });
+            }
+            upperPlayerContainer.appendChild(square);
+        }
+    }
 }
 
 function removeAllChildNodes(parent) {
