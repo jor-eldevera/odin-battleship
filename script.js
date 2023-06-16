@@ -428,18 +428,17 @@ confirmPlacementBtn.addEventListener("click", listenerFunction);
 
 let confirmPlacementAction;
 
+/**
+ * Activates the "confirm placement" action
+ * The "confirm placement" action changes depending on if the game is vs computer or vs player
+ */
 function listenerFunction() {
     confirmPlacementAction();
 }
 
-if (gameType === "computer") {
-    confirmPlacementAction = vsComputerAction;
-} else if (gameType === "player") {
-    confirmPlacementAction = vsPlayerAction;
-}
-
 function vsComputerAction() {
     choosingPhaseContainer.style.display = "none";
+    infoText.innerText = "";
 
     // Add all pieces to a GameBoard
     addShipsToGameBoard(playerOneBoard);
@@ -831,6 +830,10 @@ function waitForMedianClick() {
     });
 }
 
+/**
+ * Plays the game between two players
+ * Assumes that the GameBoards are already set up
+ */
 async function vsPlayerGameLoop() {
     let playerOneAllShipsSunk = false;
     let playerTwoAllShipsSunk = false;
@@ -872,6 +875,10 @@ async function vsPlayerGameLoop() {
     }
 }
 
+/**
+ * Builds the median screen (multiplayer)
+ * Takes down the median screen when the ready button is clicked
+ */
 function buildMedianScreen() {
     medianScreenContainer.style.display = "flex";
     medianScreenContainer.style.flexDirection = "column";
