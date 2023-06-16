@@ -106,10 +106,6 @@ footer {
     position: relative;
 }
 
-.lower-player-container-ship {
-
-}
-
 .hit {
     background-image: url(Tokens/hit_token.png);
     width: 30px;
