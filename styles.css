@@ -15,6 +15,10 @@ body {
     display: block;
 }
 
+#median-screen {
+    display: none;
+}
+
 #game-phase {
     display: none;
     /* display: flex;
