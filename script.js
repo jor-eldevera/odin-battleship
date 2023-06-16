@@ -25,7 +25,7 @@ newGameBtn.disabled = true;
 const passReadyBtn = document.getElementById("pass-ready-btn");
 
 const winnerText = document.getElementById("winner-text");
-const playersTurnText = document.getElementById("players-turn-text");
+const infoText = document.getElementById("info-text");
 
 let verticalDirection = true; // true if vertical, false if horizontal. used when placing ships
 let activeShip;
@@ -48,6 +48,7 @@ vsComputerBtn.addEventListener("click", (e) => {
     gamePhaseContainer.style.display = "flex";
     gamePhaseContainer.style.flexDirection = "column";
     gamePhaseContainer.style.alignItems = "center";
+    infoText.innerText = "Player, place your ships"
 
     // Hide the vs-phase stuff
     vsPhaseContainer.style.display = "none";
@@ -64,6 +65,7 @@ vsPlayerBtn.addEventListener("click", (e) => {
     gamePhaseContainer.style.display = "flex";
     gamePhaseContainer.style.flexDirection = "column";
     gamePhaseContainer.style.alignItems = "center";
+    infoText.innerText = "Player one, place your ships"
 
     // Hide the vs-phase stuff
     vsPhaseContainer.style.display = "none";
@@ -744,6 +746,21 @@ function buildLowerDisplayBoard(playerBoard) {
             const square = document.createElement("div");
             if (i !== 0 && j !== 0) {
                 square.classList.add("lower-display-square");
+
+                // If this square has a token, add it as a child
+                if (playerBoard.checkIfShotAlreadyMade([j, i])) {
+                    if (playerBoard.getShotTypeAtCoordinates([j, i]) === "hit") {
+                        // Create a hit element and append it to this square
+                        let tokenSquare = document.createElement("div");
+                        tokenSquare.classList.add("hit");
+                        square.appendChild(tokenSquare);
+                    } else if (playerBoard.getShotTypeAtCoordinates([j, i]) === "miss") {
+                        // Create a miss element and append it to this square
+                        let tokenSquare = document.createElement("div");
+                        tokenSquare.classList.add("miss");
+                        square.appendChild(tokenSquare);
+                    }
+                }
             }
             lowerPlayerContainer.appendChild(square);
         }
@@ -773,6 +790,9 @@ function vsPlayerAction() {
 
     // Recreate the starting grid
     createStartingGrid(upperPlayerContainer);
+
+    // Change the info text
+    infoText.innerText = "Player two, place your ships";
 
     // Disable "confirm ship placements" button
     confirmPlacementBtn.disabled = true;
@@ -818,11 +838,11 @@ async function vsPlayerGameLoop() {
 
     while (!playerOneAllShipsSunk && !playerTwoAllShipsSunk) {
         if (isPlayerOnesTurn) {
-            playersTurnText.innerText = "Player one's turn";
+            infoText.innerText = "Player one's turn";
             buildAttackBoardVsPlayer(playerTwoBoard);
             buildLowerDisplayBoard(playerOneBoard);
         } else {
-            playersTurnText.innerText = "Player two's turn";
+            infoText.innerText = "Player two's turn";
             buildAttackBoardVsPlayer(playerOneBoard);
             buildLowerDisplayBoard(playerTwoBoard);
         }
