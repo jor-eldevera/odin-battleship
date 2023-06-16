@@ -14,6 +14,7 @@ const choosingPhaseContainer = document.getElementById("choosing-phase");
 const battlePhaseContainer = document.getElementById("battle-phase");
 const shipsContainer = document.getElementById("ships");
 const medianScreenContainer = document.getElementById("median-screen");
+const statsContainer = document.getElementById("stats");
 
 const vsComputerBtn = document.getElementById("play-vs-computer-btn");
 const vsPlayerBtn = document.getElementById("play-vs-player-btn");
@@ -643,6 +644,16 @@ function buildAttackBoardVsComputer() {
                             tokenSquare.classList.add("miss");
                             square.appendChild(tokenSquare);
                         }
+
+                        // Update stats
+                        let totalShots = playerTwoBoard.getHits().length + playerTwoBoard.getMisses().length;
+                        let hitCount = playerTwoBoard.getHits().length;
+                        let missCount = playerTwoBoard.getMisses().length;
+                        let hitPercentage = playerTwoBoard.getHits().length / totalShots;
+                        statsContainer.innerText = "Total shots: " + totalShots 
+                            + ", Shots hit: " + hitCount 
+                            + ", Shots missed: " + missCount 
+                            + ", Hit percentage: " + (hitPercentage * 100).toFixed(2) + "%";
     
                         let playerTwoAllShipsSunk = playerTwoBoard.checkAllShipsSunk();
                         if (playerTwoAllShipsSunk) {
@@ -849,8 +860,9 @@ async function vsPlayerGameLoop() {
             buildAttackBoardVsPlayer(playerOneBoard);
             buildLowerDisplayBoard(playerTwoBoard);
         }
-
+        
         await waitForSquareClick();
+        buildStats();
 
         playerOneAllShipsSunk = playerOneBoard.checkAllShipsSunk();
         playerTwoAllShipsSunk = playerTwoBoard.checkAllShipsSunk();
@@ -873,6 +885,29 @@ async function vsPlayerGameLoop() {
         await waitForMedianClick();
         isPlayerOnesTurn = !isPlayerOnesTurn;
     }
+}
+
+function buildStats() {
+    let playerOneTotalShots = playerTwoBoard.getHits().length + playerTwoBoard.getMisses().length;
+    let playerOneHitCount = playerTwoBoard.getHits().length;
+    let playerOneMissCount = playerTwoBoard.getMisses().length;
+    let playerOneHitPercentage = playerTwoBoard.getHits().length / playerOneTotalShots;
+    
+    let playerTwoTotalShots = playerOneBoard.getHits().length + playerOneBoard.getMisses().length;
+    let playerTwoHitCount = playerOneBoard.getHits().length;
+    let playerTwoMissCount = playerOneBoard.getMisses().length;
+    let playerTwoHitPercentage = playerOneBoard.getHits().length / playerTwoTotalShots;
+    
+    
+    // Update stats
+    statsContainer.innerText = "Player one: Total shots: " + playerOneTotalShots 
+        + ", Shots hit: " + playerOneHitCount 
+        + ", Shots missed: " + playerOneMissCount 
+        + ", Hit percentage: " + (playerOneHitPercentage * 100).toFixed(2) + "%\n"
+        + "Player two: Total shots: " + playerTwoTotalShots 
+        + ", Shots hit: " + playerTwoHitCount 
+        + ", Shots missed: " + playerTwoMissCount 
+        + ", Hit percentage: " + (playerTwoHitPercentage * 100).toFixed(2) + "%";
 }
 
 /**
