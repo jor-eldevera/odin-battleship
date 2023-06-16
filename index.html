@@ -10,50 +10,54 @@
     <script defer type="module" src="script.js"></script>
 </head>
 <body>
-    <h1>Battleship!</h1>
-    <div id="vs-phase">
-        <button id="play-vs-computer-btn" class="vs-btn">
-            Play vs. computer
-        </button>
-        <button id="play-vs-player-btn" class="vs-btn">
-            Play vs. player (pass and play)
-        </button>
-    </div>
-
-    <div id="median-screen">
-        <div>Pass the screen then click ready</div>
-        <button id="pass-ready-btn">Ready</button>
-    </div>
-
-    <div id="game-phase">
-        <div id="info-text">
-
+    <main>
+        <h1>Battleship!</h1>
+        <div id="vs-phase">
+            <button id="play-vs-computer-btn" class="vs-btn btn">
+                Play vs. computer
+            </button>
+            <button id="play-vs-player-btn" class="vs-btn btn">
+                Play vs. player (pass and play)
+            </button>
         </div>
-
-        <div id="battle-phase">
-            <button id="new-game-btn" disabled>Start a new game</button>
-            <div id="winner-text">
-    
+        
+        <div id="median-screen">
+            <div>Pass the screen then click ready</div>
+            <button id="pass-ready-btn" class="btn">Ready</button>
+        </div>
+        
+        <div id="game-phase">
+            <div id="info-text">
+                
             </div>
-        </div>
-
-        <div id="upper-player-container">
-    
-        </div>
-        <div id="lower-player-container">
-    
-        </div>
-    
-        <div id="choosing-phase">
-            <button id="confirm-placement-btn" disabled>Confirm Ship Placements</button>
-            <button id="switch-directions-btn">Switch Direction</button>
-            <div id="ships">
             
+            <div id="battle-phase">
+                <button id="new-game-btn" class="btn">Start a new game</button>
+                <div id="winner-text">
+        
+                </div>
+            </div>
+            
+            <div id="upper-player-container">
+                
+            </div>
+            <div id="lower-player-container">
+                
+            </div>
+        
+            <div id="choosing-phase">
+                <button id="confirm-placement-btn" class="btn" disabled>Confirm Ship Placements</button>
+                <button id="switch-directions-btn" class="btn">Switch Direction</button>
+                <div id="ships">
+                    
+                </div>
+            </div>
+
+            <div id="stats">
+                
             </div>
         </div>
-    
-    </div>
-
+    </main>
     <footer>by Jorell de Vera</footer>
 </body>
 </html>
