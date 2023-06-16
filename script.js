@@ -901,9 +901,8 @@ function buildAttackBoardVsPlayer(gameBoard) {
                 square.addEventListener("click", function shootBoard() {
                     if (!square.children[0]) { // This line prevents multiple attack events on one square
                         gameBoard.recieveAttack([j, i]);
+                        squareClickedPromise();
                     }
-
-                    squareClickedPromise();
                 }, { signal });
 
                 // If this square has a token, add it as a child
